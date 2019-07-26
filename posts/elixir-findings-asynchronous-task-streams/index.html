@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="//gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.55.6" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Elixir Findings: Asynchronous Task Streams &middot; dino (dot) codes</title>
+
+  
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/poole.css">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/override.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono|Literata|Abril+Fatface|PT+Sans:400,400i,700">
+
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  
+</head>
+
+  <body class=" ">
+  <aside class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="http://www.dino.codes/"><h1>dino (dot) codes</h1></a>
+      <p class="lead">
+       General banter about Software Development. 
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="http://www.dino.codes/">Home</a> </li>
+        <li><a href="https://github.com/joaofcosta/"> Github </a></li><li><a href="https://medium.com/@dinojoaocosta"> Medium </a></li><li><a href="https://twitter.com/joaofcosta_"> Twitter </a></li>
+      </ul>
+    </nav>
+
+    <p>&copy; 2019. All rights reserved. </p>
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Elixir Findings: Asynchronous Task Streams</h1>
+  <time datetime=2019-07-24T09:56:13&#43;0100 class="post-date">Wed, Jul 24, 2019</time>
+  
+
+<p>The other day I was solving an Exercism.io exercise that involved calculating
+the frequency of letters in multiple texts in parallel using only a specific
+number of &ldquo;workers&rdquo;. This same exercise helped me stumble into
+<code>Task.async_stream/3</code> and <code>Task.async_stream/5</code>.</p>
+
+<p>For those unfamiliar with the <code>Task</code> module here&rsquo;s the description you can find on Elixir&rsquo;s documentation:</p>
+
+<blockquote>
+<p>Conveniences for spawning and awaiting tasks.
+Tasks are processes meant to execute one particular action throughout their lifetime, often with little or no communication with other processes. The most common use case for tasks is to convert sequential code into concurrent code by computing a value asynchronously.</p>
+</blockquote>
+
+<p>Let&rsquo;s say we want to increase a list of numbers by 1 in parallel, up until now I&rsquo;d mainly use the Task module in the following way to accomplish this task:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#ae81ff">1</span><span style="color:#f92672">..</span><span style="color:#ae81ff">10</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">map</span><span style="color:#111">(</span><span style="color:#111">fn</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">)</span> <span style="color:#f92672">-&gt;</span> <span style="color:#75af00">Task</span><span style="color:#f92672">.</span><span style="color:#111">async</span><span style="color:#111">(</span><span style="color:#111">fn</span> <span style="color:#f92672">-&gt;</span> <span style="color:#111">number</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#111">end</span><span style="color:#111">)</span> <span style="color:#111">end</span><span style="color:#111">)</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">map</span><span style="color:#111">(</span><span style="color:#111">fn</span><span style="color:#111">(</span><span style="color:#111">task</span><span style="color:#111">)</span> <span style="color:#f92672">-&gt;</span> <span style="color:#75af00">Task</span><span style="color:#f92672">.</span><span style="color:#111">await</span><span style="color:#111">(</span><span style="color:#111">task</span><span style="color:#111">)</span> <span style="color:#111">end</span><span style="color:#111">)</span></code></pre></div>
+<p>This is a little cumbersome because you basically have to define a nested anonymous function, the one inside the first call to <code>Enum.map</code>, and you have to basically make two function calls to start the task and fetch the result. First, we create the task with <code>Task.async</code>, and then we fetch the result using <code>Task.await</code>.</p>
+
+<h2 id="simplicity">Simplicity</h2>
+
+<p>Luckily, <code>Task.async_stream</code> let us do this in a more simple, cleaner way.</p>
+
+<p>Using <code>Task.async_stream</code> will allow you to create a stream of asynchronous
+tasks, where each task will run a specific function on each element of the
+provided enumerable, in this case, the list of numbers.</p>
+
+<p>Here&rsquo;s how you&rsquo;d implement the same example shown above but using the
+<code>Task.async_stream/3</code> function:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#75af00">Task</span><span style="color:#f92672">.</span><span style="color:#111">async_stream</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#f92672">..</span><span style="color:#ae81ff">10</span><span style="color:#111">,</span> <span style="color:#111">fn</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">)</span> <span style="color:#f92672">-&gt;</span> <span style="color:#111">number</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#111">end</span><span style="color:#111">)</span></code></pre></div>
+<p>Here&rsquo;s what I&rsquo;d say is the first main advantage you get by using
+<code>Task.async_stream</code>, you can see that the code looks way cleaner, and is
+simpler to reason about, at least for this specific example.</p>
+
+<p>Furthermore, if you wish you can pass the reference to a given function in
+<code>Task.async_stream</code> instead of providing an anonymous function, for example:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">defmodule</span> <span style="color:#75af00">Increaser</span> <span style="color:#111">do</span>
+  <span style="color:#111">def</span> <span style="color:#111">increase</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">)</span> <span style="color:#111">do</span>
+    <span style="color:#111">number</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+  <span style="color:#111">end</span>
+<span style="color:#111">end</span></code></pre></div>
+<h2 id="lazy-evaluation">Lazy Evaluation</h2>
+
+<p>If you run the previous example on iex you&rsquo;ll get output similar to this:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#75715e">#Function&lt;1.111840141/2 in Task.build_stream/3&gt;</span></code></pre></div>
+<p>This is because <code>Task.async_stream</code>, contrary to <code>Task.await</code>, uses lazy
+evaluation, which means that the tasks won&rsquo;t be executed until you actually
+need their results. However, you won&rsquo;t need to call <code>Task.await</code> this time
+around.</p>
+
+<p>In order to get the result of running the tasks, you can use something like
+<code>Enum.to_list/1</code>:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#ae81ff">1</span><span style="color:#f92672">..</span><span style="color:#ae81ff">10</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Task</span><span style="color:#f92672">.</span><span style="color:#111">async_stream</span><span style="color:#111">(</span><span style="color:#111">fn</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">)</span> <span style="color:#f92672">-&gt;</span> <span style="color:#111">number</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#111">end</span><span style="color:#111">)</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">to_list</span><span style="color:#111">()</span></code></pre></div>
+<p>Running this on iex will return the following output:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">[</span><span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">2</span><span style="color:#111">,</span> <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">4</span><span style="color:#111">,</span> <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">5</span><span style="color:#111">,</span> <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">6</span><span style="color:#111">,</span> <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">7</span><span style="color:#111">,</span> <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">8</span><span style="color:#111">,</span> <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">9</span><span style="color:#111">,</span> <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">10</span><span style="color:#111">,</span> <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">11</span><span style="color:#111">]</span></code></pre></div>
+<p>You might be wondering why the final result is a Keyword list, however, the
+result is actually a list of tuples. Every task returns a tuple where the first element is either <code>:ok</code> or <code>:error</code> and the second element is the result of the
+function call, or <code>:timeout</code> as we&rsquo;ll see in a future section.</p>
+
+<p>With this in mind if you want to retrieve only the result of the function calls
+you can instead run:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#ae81ff">1</span><span style="color:#f92672">..</span><span style="color:#ae81ff">10</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Task</span><span style="color:#f92672">.</span><span style="color:#111">async_stream</span><span style="color:#111">(</span><span style="color:#111">fn</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">)</span> <span style="color:#f92672">-&gt;</span> <span style="color:#111">number</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#111">end</span><span style="color:#111">)</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">map</span><span style="color:#111">(</span><span style="color:#111">fn</span><span style="color:#111">({</span><span style="color:#d88200">:ok</span><span style="color:#111">,</span> <span style="color:#111">result</span><span style="color:#111">})</span> <span style="color:#f92672">-&gt;</span> <span style="color:#111">result</span> <span style="color:#111">end</span><span style="color:#111">)</span></code></pre></div>
+<p>This will return the following list:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">[</span><span style="color:#ae81ff">2</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#ae81ff">4</span><span style="color:#111">,</span> <span style="color:#ae81ff">5</span><span style="color:#111">,</span> <span style="color:#ae81ff">6</span><span style="color:#111">,</span> <span style="color:#ae81ff">7</span><span style="color:#111">,</span> <span style="color:#ae81ff">8</span><span style="color:#111">,</span> <span style="color:#ae81ff">9</span><span style="color:#111">,</span> <span style="color:#ae81ff">10</span><span style="color:#111">,</span> <span style="color:#ae81ff">11</span><span style="color:#111">]</span></code></pre></div>
+<h2 id="concurrency">Concurrency</h2>
+
+<p>Another feature that <code>Task.async_stream</code> provides is to define how many tasks
+you want to run in parallel at any given time. You can define this by specifying a value for <code>:max_concurrency</code> on the function options, which defaults to
+<code>System.schedulers_online/0</code>.</p>
+
+<p>Here&rsquo;s an example that will let us confirm this behaviour, allowing only 2 tasks to be run in parallel at any given time:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">defmodule</span> <span style="color:#75af00">Processor</span> <span style="color:#111">do</span>
+  <span style="color:#111">def</span> <span style="color:#111">process</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">)</span> <span style="color:#111">do</span>
+    <span style="color:#d88200">:timer</span><span style="color:#f92672">.</span><span style="color:#111">sleep</span><span style="color:#111">(</span><span style="color:#ae81ff">1000</span><span style="color:#111">)</span>
+    <span style="color:#111">{</span><span style="color:#111">number</span><span style="color:#111">,</span> <span style="color:#d88200">:os</span><span style="color:#f92672">.</span><span style="color:#111">system_time</span><span style="color:#111">(</span><span style="color:#d88200">:millisecond</span><span style="color:#111">)}</span>
+  <span style="color:#111">end</span>
+<span style="color:#111">end</span>
+
+<span style="color:#ae81ff">1</span><span style="color:#f92672">..</span><span style="color:#ae81ff">10</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Task</span><span style="color:#f92672">.</span><span style="color:#111">async_stream</span><span style="color:#111">(</span><span style="color:#f92672">&amp;</span><span style="color:#75af00">Processor</span><span style="color:#f92672">.</span><span style="color:#111">process</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#d88200">max_concurrency</span><span style="color:#111">:</span> <span style="color:#ae81ff">2</span><span style="color:#111">)</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">to_list</span><span style="color:#111">()</span></code></pre></div>
+<p>In the example above, on <code>Processor.process/1</code> we&rsquo;re returning a tuple where the first element is the argument that was provided to the function and the second
+one is the current time in milliseconds.</p>
+
+<p>Using a <code>:max_concurrency</code> of 2 should let us see that, for example, the time
+differences between number 1 and number 3 should be of roughly 1000
+milliseconds, the same goes for between 2 and 4, 6 and 8, etc.</p>
+
+<p>If you run this example in iex you&rsquo;ll get output similar to this:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">[</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#111">{</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#ae81ff">1549319667100</span><span style="color:#111">},</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#111">{</span><span style="color:#ae81ff">2</span><span style="color:#111">,</span> <span style="color:#ae81ff">1549319667100</span><span style="color:#111">},</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#111">{</span><span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#ae81ff">1549319668102</span><span style="color:#111">},</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#111">{</span><span style="color:#ae81ff">4</span><span style="color:#111">,</span> <span style="color:#ae81ff">1549319668102</span><span style="color:#111">},</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#111">{</span><span style="color:#ae81ff">5</span><span style="color:#111">,</span> <span style="color:#ae81ff">1549319669102</span><span style="color:#111">},</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#111">{</span><span style="color:#ae81ff">6</span><span style="color:#111">,</span> <span style="color:#ae81ff">1549319669102</span><span style="color:#111">},</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#111">{</span><span style="color:#ae81ff">7</span><span style="color:#111">,</span> <span style="color:#ae81ff">1549319670103</span><span style="color:#111">},</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#111">{</span><span style="color:#ae81ff">8</span><span style="color:#111">,</span> <span style="color:#ae81ff">1549319670103</span><span style="color:#111">},</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#111">{</span><span style="color:#ae81ff">9</span><span style="color:#111">,</span> <span style="color:#ae81ff">1549319671104</span><span style="color:#111">},</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#111">{</span><span style="color:#ae81ff">10</span><span style="color:#111">,</span> <span style="color:#ae81ff">1549319671104</span><span style="color:#111">}</span>
+<span style="color:#111">]</span></code></pre></div>
+<p>We can confirm that the result is what we were expecting. In short, seeing as
+we set <code>:max_concurrency</code> to 2, the tasks are processed sort of like in
+&ldquo;bundles&rdquo;, 1 is processed at the same time as 2, 3 is processed at the same
+time as 4, 5 is processed at the same time as 6, etc.</p>
+
+<figure>
+    <img src="/elixir_findings.png"
+         alt="Task Execution Time"/> <figcaption>
+            <p>Task Execution Times</p>
+        </figcaption>
+</figure>
+
+
+<p>Notice that this only happens because the time to execute <code>Processor.process/1</code>
+is always the same, the tasks are not dependent on one another, so no task
+waits for another to finish.</p>
+
+<h2 id="timeouts">Timeouts</h2>
+
+<p>You can limit the runtime of the tasks that are created with <code>Task.async_stream</code>
+, the default value is of 5000 milliseconds. I&rsquo;m going to user <code>:timer.sleep</code> with a value greater than 5000 (the default timeout value) to force a task to timeout and see what&rsquo;s the behaviour when that happens:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">defmodule</span> <span style="color:#75af00">Processor</span> <span style="color:#111">do</span>
+  <span style="color:#111">def</span> <span style="color:#111">process</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">)</span> <span style="color:#111">do</span>
+    <span style="color:#d88200">:timer</span><span style="color:#f92672">.</span><span style="color:#111">sleep</span><span style="color:#111">(</span><span style="color:#ae81ff">6000</span><span style="color:#111">)</span>
+  <span style="color:#111">end</span>
+<span style="color:#111">end</span>
+
+<span style="color:#ae81ff">1</span><span style="color:#f92672">..</span><span style="color:#ae81ff">10</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Task</span><span style="color:#f92672">.</span><span style="color:#111">async_stream</span><span style="color:#111">(</span><span style="color:#f92672">&amp;</span><span style="color:#75af00">Processor</span><span style="color:#f92672">.</span><span style="color:#111">process</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1</span><span style="color:#111">)</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">to_list</span><span style="color:#111">()</span></code></pre></div>
+<p>If you run this example on iex you can confirm that the process that spawned the tasks exits with an output like:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#f92672">**</span> <span style="color:#111">(</span><span style="color:#111">exit</span><span style="color:#111">)</span> <span style="color:#111">exited</span> <span style="color:#d88200">in</span><span style="color:#111">:</span> <span style="color:#75af00">Task.Supervised</span><span style="color:#f92672">.</span><span style="color:#111">stream</span><span style="color:#111">(</span><span style="color:#ae81ff">5000</span><span style="color:#111">)</span>
+    <span style="color:#f92672">**</span> <span style="color:#111">(</span><span style="color:#75af00">EXIT</span><span style="color:#111">)</span> <span style="color:#111">time</span> <span style="color:#111">out</span>
+    <span style="color:#111">(</span><span style="color:#111">elixir</span><span style="color:#111">)</span> <span style="color:#111">lib</span><span style="color:#f92672">/</span><span style="color:#111">task</span><span style="color:#f92672">/</span><span style="color:#111">supervised</span><span style="color:#f92672">.</span><span style="color:#111">ex</span><span style="color:#111">:</span><span style="color:#ae81ff">276</span><span style="color:#111">:</span> <span style="color:#75af00">Task.Supervised</span><span style="color:#f92672">.</span><span style="color:#111">stream_reduce</span><span style="color:#f92672">/</span><span style="color:#ae81ff">7</span>
+    <span style="color:#111">(</span><span style="color:#111">elixir</span><span style="color:#111">)</span> <span style="color:#111">lib</span><span style="color:#f92672">/</span><span style="color:#111">enum</span><span style="color:#f92672">.</span><span style="color:#111">ex</span><span style="color:#111">:</span><span style="color:#ae81ff">3015</span><span style="color:#111">:</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">reverse</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1</span>
+    <span style="color:#111">(</span><span style="color:#111">elixir</span><span style="color:#111">)</span> <span style="color:#111">lib</span><span style="color:#f92672">/</span><span style="color:#111">enum</span><span style="color:#f92672">.</span><span style="color:#111">ex</span><span style="color:#111">:</span><span style="color:#ae81ff">2649</span><span style="color:#111">:</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">to_list</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1</span></code></pre></div>
+<p>In this case, it doesn&rsquo;t matter which task times out, if one of the task times
+out the process exits, even if a number of tasks completed successfully. If we
+don&rsquo;t want the task to timeout we can specify the <code>:timeout</code> value in the
+<code>Task.async_stream/3</code> function options like so:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">defmodule</span> <span style="color:#75af00">Processor</span> <span style="color:#111">do</span>
+  <span style="color:#111">def</span> <span style="color:#111">process</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">)</span> <span style="color:#111">do</span>
+    <span style="color:#d88200">:timer</span><span style="color:#f92672">.</span><span style="color:#111">sleep</span><span style="color:#111">(</span><span style="color:#ae81ff">6000</span><span style="color:#111">)</span>
+  <span style="color:#111">end</span>
+<span style="color:#111">end</span>
+
+<span style="color:#ae81ff">1</span><span style="color:#f92672">..</span><span style="color:#ae81ff">10</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Task</span><span style="color:#f92672">.</span><span style="color:#111">async_stream</span><span style="color:#111">(</span><span style="color:#f92672">&amp;</span><span style="color:#75af00">Processor</span><span style="color:#f92672">.</span><span style="color:#111">process</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#d88200">timeout</span><span style="color:#111">:</span> <span style="color:#ae81ff">7000</span><span style="color:#111">)</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">to_list</span><span style="color:#111">()</span></code></pre></div>
+<p>However, <code>Task.async_stream/3</code> allows us to specify different behaviours for
+when tasks time out by changing the value of <code>:on_timeout</code> on the function
+options.</p>
+
+<p>Here&rsquo;s the list of values that can be used on <code>:on_timeout</code>:</p>
+
+<ul>
+<li><code>:exit</code> - This is the default value. In this situation the process that spawned the task exits</li>
+<li><code>:kill_task</code> - In this case, only the task that timed out is killed. If the first task in the stream fails the others might be able to still finish. The value emitted for this task is the tuple <code>{:exit, :timeout}</code></li>
+</ul>
+
+<p>Let&rsquo;s check how using <code>:kill_task</code> only terminates the task that times out
+while letting the other tasks finish:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">defmodule</span> <span style="color:#75af00">Processor</span> <span style="color:#111">do</span>
+  <span style="color:#111">def</span> <span style="color:#111">process</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">)</span> <span style="color:#111">do</span>
+    <span style="color:#d88200">:timer</span><span style="color:#f92672">.</span><span style="color:#111">sleep</span><span style="color:#111">(</span><span style="color:#ae81ff">10000</span> <span style="color:#f92672">-</span> <span style="color:#111">(</span><span style="color:#111">number</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span><span style="color:#111">))</span>
+    <span style="color:#111">number</span>
+  <span style="color:#111">end</span>
+<span style="color:#111">end</span>
+
+<span style="color:#ae81ff">1</span><span style="color:#f92672">..</span><span style="color:#ae81ff">10</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Task</span><span style="color:#f92672">.</span><span style="color:#111">async_stream</span><span style="color:#111">(</span><span style="color:#f92672">&amp;</span><span style="color:#75af00">Processor</span><span style="color:#f92672">.</span><span style="color:#111">process</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#d88200">on_timeout</span><span style="color:#111">:</span> <span style="color:#d88200">:kill_task</span><span style="color:#111">)</span>
+<span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">to_list</span><span style="color:#111">()</span></code></pre></div>
+<p>In the example above we see that for each number we make the following call 
+<code>:timer.sleep(10000 - (number * 1000))</code>. Provided that our list of numbers is
+from 1 to 10 here&rsquo;s what the value passed into <code>:timer.sleep</code> is for each number:</p>
+
+<ul>
+<li>1 - 9000 milliseconds</li>
+<li>2 - 8000 milliseconds</li>
+<li>3 - 7000 milliseconds</li>
+<li>4 - 6000 milliseconds</li>
+<li>5 - 5000 milliseconds</li>
+<li>6 - 4000 milliseconds</li>
+<li>7 - 3000 milliseconds</li>
+<li>8 - 2000 milliseconds</li>
+<li>9 - 1000 milliseconds</li>
+<li>10 - 0 milliseconds</li>
+</ul>
+
+<p>Taking into account that the default timeout value is of 5000 milliseconds than
+we should see that only the tasks for 6 or greater are completed (5 shouldn&rsquo;t be completed because of the overhead of setting up the task).</p>
+
+<p>Running the example on <code>iex</code> yields the following result:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">[</span>
+  <span style="color:#d88200">exit</span><span style="color:#111">:</span> <span style="color:#d88200">:timeout</span><span style="color:#111">,</span>
+  <span style="color:#d88200">exit</span><span style="color:#111">:</span> <span style="color:#d88200">:timeout</span><span style="color:#111">,</span>
+  <span style="color:#d88200">exit</span><span style="color:#111">:</span> <span style="color:#d88200">:timeout</span><span style="color:#111">,</span>
+  <span style="color:#d88200">exit</span><span style="color:#111">:</span> <span style="color:#d88200">:timeout</span><span style="color:#111">,</span>
+  <span style="color:#d88200">exit</span><span style="color:#111">:</span> <span style="color:#d88200">:timeout</span><span style="color:#111">,</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">6</span><span style="color:#111">,</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">7</span><span style="color:#111">,</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">8</span><span style="color:#111">,</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">9</span><span style="color:#111">,</span>
+  <span style="color:#d88200">ok</span><span style="color:#111">:</span> <span style="color:#ae81ff">10</span>
+<span style="color:#111">]</span></code></pre></div>
+<p>This is what we expected, only the tasks with a number greater than or equal to
+6 were terminated while the other ones were killed because they timed out.
+You can confirm this because the result for the tasks that were started with a
+number less than or equal to 5 all returned the tuple <code>{:error, :timeout}</code>.</p>
+
+<p>With this in mind use <code>on_timeout: :kill_task</code> whenever you want to allow tasks
+to finish independently of other tasks timing out.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In conclusion, I think <code>Task.async_stream</code> allows you to apply a certain
+function call, in parallel, to an enumerable without having to make calls to
+<code>Task.async</code> and <code>Task.await</code> which, in my opinion, leads to cleaner code.</p>
+
+<p>On the other hand, you also get different timeout behaviours, which is not
+possible using <code>Task.await</code>, although <code>Task.await</code> also allows you to specify
+timeouts.</p>
+
+<p>Finally, you also get the possibility of specifying the maximum number of tasks
+you want to run in parallel at any given time. I think this can be super useful, for example, in a situation where you&rsquo;re making multiple requests to a given
+service and you want to control the load you&rsquo;re putting into it, without
+compromising its availability.</p>
+
+<p>If you want to check the full documentation for both <code>Task.async_stream/3</code> and <code>Task.async_stream/5</code> check the <a href="https://hexdocs.pm/elixir/Task.html?source=post_page---------------------------#async_stream/3">Elixir Docs</a>.</p>
+
+</div>
+
+
+    </main>
+
+    
+  </body>
+</html>
