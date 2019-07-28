@@ -1,7 +1,11 @@
-/* html {
-  font-family: "Literata";
+html {
+  font-family: "Source Sans Pro";
+}
+
+h1 {
+  font-family: "Libre Baskerville";
 }
 
 code {
   font-family: "Fira Mono";
-} */
+}
