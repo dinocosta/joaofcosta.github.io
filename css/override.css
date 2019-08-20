@@ -1,11 +1,7 @@
-html {
-  font-family: "Source Sans Pro";
-}
+html { font-family: "Droid Serif"; }
 
-h1 {
-  font-family: "Libre Baskerville";
-}
+.sidebar-about h1 { font-family: "Montserrat"; }
 
-code {
-  font-family: "Fira Mono";
-}
+h1 { font-family: "Montserrat"; }
+
+code { font-family: "Fira Mono"; }
