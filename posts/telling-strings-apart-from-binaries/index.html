@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="//gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.55.6" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Telling Strings Apart From Binaries In Elixir &middot; dino (dot) codes</title>
+
+  
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/poole.css">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/override.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro|Playfair+Display|Fira+Mono">
+
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  
+</head>
+
+  <body class=" ">
+  <aside class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="http://www.dino.codes/"><h1>dino (dot) codes</h1></a>
+      <p class="lead">
+       Thoughts and opinions on Software Development and Music Production. 
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="http://www.dino.codes/">Home</a> </li>
+        <li><a href="https://github.com/joaofcosta/"> Github </a></li><li><a href="https://medium.com/@dinojoaocosta"> Medium </a></li><li><a href="https://soundcloud.com/dino-costa-180136083"> Soundcloud </a></li><li><a href="https://twitter.com/joaofcosta_"> Twitter </a></li>
+      </ul>
+    </nav>
+
+    <p>&copy; 2019. All rights reserved. </p>
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Telling Strings Apart From Binaries In Elixir</h1>
+  <time datetime=2019-07-26T18:34:44&#43;0100 class="post-date">Fri, Jul 26, 2019</time>
+  <p>If you open an <code>iex</code> shell right now and type <code>i &quot;string&quot;</code> this is the result
+you&rsquo;ll get:</p>
+
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Term
+  &#34;string&#34;
+Data type
+<span style="display:block;width:100%;background-color:#e1e1e1">  BitString
+</span>Byte size
+  6
+Description
+  This is a string: a UTF-8 encoded binary. It&#39;s printed surrounded by
+  &#34;double quotes&#34; because all UTF-8 encoded codepoints in it are printable.
+Raw representation
+  &lt;&lt;115, 116, 114, 105, 110, 103&gt;&gt;
+Reference modules
+<span style="display:block;width:100%;background-color:#e1e1e1">  String, :binary
+</span>Implemented protocols
+  Collectable, IEx.Info, Inspect, List.Chars, String.Chars</code></pre></div>
+
+<p>and if you type <code>i &lt;&lt;-1&gt;&gt;</code> you&rsquo;ll get the following output:</p>
+
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Term
+  &lt;&lt;255&gt;&gt;
+Data type
+<span style="display:block;width:100%;background-color:#e1e1e1">  BitString
+</span>Byte size
+  1
+Description
+  This is a binary: a collection of bytes. It&#39;s printed with the `&lt;&lt;&gt;&gt;`
+  syntax (as opposed to double quotes) because it is not a UTF-8 encoded
+  binary (the first invalid byte being `&lt;&lt;255&gt;&gt;`)
+Reference modules
+<span style="display:block;width:100%;background-color:#e1e1e1">  :binary
+</span>Implemented protocols
+  Collectable, IEx.Info, Inspect, List.Chars, String.Chars</code></pre></div>
+
+<p>If you&rsquo;ve noticed the highlighted lines you&rsquo;ll see that although the Data
+Type value is the same for both, <code>BitString</code>, the Reference Modules value
+is different. For <code>&quot;string&quot;</code> we have both <code>String</code> and <code>:binary</code> as reference
+modules, while for <code>&lt;&lt;-1&gt;&gt;</code>, we only have <code>:binary</code> as a reference module.</p>
+
+<p>In short, strings in Elixir are always binaries, but not all binaries can be
+strings.</p>
+
+<p>It may sometimes be useful to tell one apart from the other. I&rsquo;m currently
+working on a library which implements the OSC protocol in Elixir and,
+depending on if the binary can be a string or not, it will either be encoded
+as an OSC String or as an OSC Blob, respectively.</p>
+
+<p>So, in order to tell if a given binary can be a string you can simply use
+<code>String.valid?/1</code>. Let&rsquo;s test it with the two examples showed at the beginning
+of the post, <code>&quot;string&quot;</code> and <code>&lt;&lt;-1&gt;&gt;</code>:</p>
+
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">iex</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">)</span><span style="color:#f92672">&gt;</span> <span style="color:#75af00">String</span><span style="color:#f92672">.</span><span style="color:#111">valid?</span><span style="color:#111">(</span><span style="color:#d88200">&#34;string&#34;</span><span style="color:#111">)</span>
+<span style="color:#111">true</span>
+<span style="color:#111">iex</span><span style="color:#111">(</span><span style="color:#ae81ff">2</span><span style="color:#111">)</span><span style="color:#f92672">&gt;</span> <span style="color:#75af00">String</span><span style="color:#f92672">.</span><span style="color:#111">valid?</span><span style="color:#111">(&lt;&lt;</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span><span style="color:#111">&gt;&gt;)</span>
+<span style="color:#111">false</span></code></pre></div>
+
+<p>As expected, <code>&quot;string&quot;</code>, or <code>&lt;&lt;115, 116, 114, 105, 110, 103&gt;&gt;</code> in binary, is
+a valid string, however <code>&lt;&lt;-1&gt;&gt;</code> is not.</p>
+
+<p>And now we know how to tell strings apart from binaries in Elixir.</p>
+
+</div>
+
+
+    </main>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-144751197-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+  </body>
+</html>

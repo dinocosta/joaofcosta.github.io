@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="//gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.55.6" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Python Tuples Are Dangerous &middot; dino (dot) codes</title>
+
+  
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/poole.css">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/hyde.css">
+  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/override.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro|Playfair+Display|Fira+Mono">
+
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  
+</head>
+
+  <body class=" ">
+  <aside class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="http://www.dino.codes/"><h1>dino (dot) codes</h1></a>
+      <p class="lead">
+       Thoughts and opinions on Software Development and Music Production. 
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="http://www.dino.codes/">Home</a> </li>
+        <li><a href="https://github.com/joaofcosta/"> Github </a></li><li><a href="https://medium.com/@dinojoaocosta"> Medium </a></li><li><a href="https://soundcloud.com/dino-costa-180136083"> Soundcloud </a></li><li><a href="https://twitter.com/joaofcosta_"> Twitter </a></li>
+      </ul>
+    </nav>
+
+    <p>&copy; 2019. All rights reserved. </p>
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Python Tuples Are Dangerous</h1>
+  <time datetime=2019-12-23T12:41:57Z class="post-date">Mon, Dec 23, 2019</time>
+  
+
+<p>How do you create a new list in Python?</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">[</span><span style="color:#d88200">&#34;this is a list&#34;</span><span style="color:#111">]</span></code></pre></div>
+<p>How do you create a new set in Python?</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">{</span><span style="color:#d88200">&#34;this is a set&#34;</span><span style="color:#111">}</span></code></pre></div>
+<p>How do you create a new tuple in Python?</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">(</span><span style="color:#d88200">&#34;sorry! this is not a tuple&#34;</span><span style="color:#111">)</span></code></pre></div>
+<p>Yup, unfortunately the way you create a one element tuple does not conform with
+the rest of the data structures in Python which you can create using &ldquo;special&rdquo; characters.</p>
+
+<p>In the example above, if you want to create a tuple with only one element you must not forget the
+final comma:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">(</span><span style="color:#d88200">&#34;this is now a tuple thanks to the comma&#34;</span><span style="color:#111">,)</span></code></pre></div>
+<p>I think this is bad. First because it&rsquo;s different from all the other listed above, secondly because
+a string, as well as a list, set and tuple, is also enumerable.
+So, for functions that are expecting enumerables, if you provide them with a string they will &ldquo;sort
+of&rdquo; work.</p>
+
+<p>A coworker of mine justified the behaviour with
+&gt; &ldquo;But you need the parenthesis in order to do math operations. How would you differentiate between
+&gt; a tuple with one int and a parenthesis which is only wrapping a mathematical operation?&rdquo;</p>
+
+<p>Namely:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">(</span><span style="color:#ae81ff">2</span><span style="color:#111">)</span>
+
+<span style="color:#111">(</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#111">)</span></code></pre></div>
+<p>The first one leads me to think we&rsquo;re creating a tuple, when in truth, it&rsquo;s result is the same as
+the second expression.</p>
+
+<h2 id="getting-bit-by-it">Getting bit by it!</h2>
+
+<p>Why did I bother making a blog post about this? Mostly because I got bitten by this little Python
+behaviour at work.</p>
+
+<p>I was updating one codebase&rsquo;s tests, which uses
+<a href="https://github.com/pnuckowski/aioresponses">aioresponse</a> in order to mock web requests when
+working with <a href="https://aiohttp.readthedocs.io/en/stable/">aiohttp</a>.  We were using it as a context
+manager, and you can provide a <code>passthrough</code> parameter to it, this should be an iterable, which
+contains all the hosts that aioresponse must not mock. Since we were doing service level tests we
+don&rsquo;t want to mock requests to the actual service&rsquo;s URL.</p>
+
+<p>This is how the specific code that uses aioresponse was when I started working on it:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a8c8">with</span> <span style="color:#111">aioresponses</span><span style="color:#111">(</span><span style="color:#111">passthrough</span><span style="color:#f92672">=</span><span style="color:#111">(</span><span style="color:#111">service_host</span><span style="color:#111">,</span> <span style="color:#111">external_url</span><span style="color:#111">))</span> <span style="color:#00a8c8">as</span> <span style="color:#111">responses</span><span style="color:#111">:</span>
+    <span style="color:#00a8c8">yield</span> <span style="color:#111">responses</span></code></pre></div>
+<p><code>service_host</code> refers to the URL of the service being updated/maintained, while <code>external_url</code> was
+the URL of another service in which the one being updated depends on.</p>
+
+<p>I decided to update this so as to mock the calls to the <code>external_url</code> since we want to avoid,
+as much as possible, having to make HTTP requests to other services when doing service level tests.
+As such, I updated the <code>passthrough</code> parameter as seen in the code below:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#00a8c8">with</span> <span style="color:#111">aioresponses</span><span style="color:#111">(</span><span style="color:#111">passthrough</span><span style="color:#f92672">=</span><span style="color:#111">(</span><span style="color:#111">service_host</span><span style="color:#111">))</span> <span style="color:#00a8c8">as</span> <span style="color:#111">responses</span><span style="color:#111">:</span>
+    <span style="color:#00a8c8">yield</span> <span style="color:#111">responses</span></code></pre></div>
+<p>As you can probably notice, I forgot to add the final comma&hellip;</p>
+
+<p>So, now instead of providing a tuple to <code>passthrough</code> we were providing a string. However, since a
+string can also be iterated the code wasn&rsquo;t broken per say.  When running the test suite no errors
+were thrown but the test suite didn&rsquo;t run successfully.</p>
+
+<p>When looking at <code>aioresponse</code>&rsquo;s codebase we noticed that it iterates through the <code>passthrough</code> value
+and checks if the current URL starts with any of the values in <code>passthrough</code>.</p>
+
+<p><strong>Since we only passed a
+string, when iterating through <code>passthrough</code> the first value will be <code>&quot;h&quot;</code></strong>. Can you see where this is going?</p>
+
+<p>I&rsquo;ll leave a snippet here to give you and idea of what I&rsquo;m talking about:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">passthrough</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#d88200">&#34;http://do_not_mock.com&#34;</span><span style="color:#111">)</span>
+<span style="color:#111">current_url</span> <span style="color:#f92672">=</span> <span style="color:#d88200">&#34;http://mock_me.com&#34;</span>
+
+<span style="color:#00a8c8">for</span> <span style="color:#111">url</span> <span style="color:#f92672">in</span> <span style="color:#111">passthrough</span><span style="color:#111">:</span>
+  <span style="color:#00a8c8">if</span> <span style="color:#111">current_url</span><span style="color:#f92672">.</span><span style="color:#111">startswith</span><span style="color:#111">(</span><span style="color:#111">url</span><span style="color:#111">):</span>
+    <span style="color:#75715e"># Do not mock current_url!</span></code></pre></div>
+<p>Basically no HTTP requests were being mocked because all the URLs used in the test suite start with
+<code>&quot;http&quot;</code> (<em>well, that&rsquo;s a first!</em>) and <code>&quot;http...&quot;.startswith(&quot;h&quot;)</code> does return <code>True</code>. All of this,
+and three hours lost, because of a sneaky comma!!!</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In conclusion, be carefule how you use your parenthesis! We could probably have a better way to
+initialise tuples with only one element in Python.</p>
+
+<p>This doesn&rsquo;t mean that Python is bad or that
+<a href="https://github.com/pnuckowski/aioresponses">aioresponse</a> should be updated to handle this scenario,
+I just think we could have some kind of syntax which would avoid these specific situations.</p>
+
+</div>
+
+
+    </main>
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-144751197-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+  </body>
+</html>
