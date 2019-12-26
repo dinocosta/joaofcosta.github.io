@@ -6,10 +6,22 @@
     <description>Recent content on dino (dot) codes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 24 Jul 2019 09:56:13 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 23 Dec 2019 12:41:57 +0000</lastBuildDate>
     
 	<atom:link href="http://www.dino.codes/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Python Tuple Syntax Is Confusing</title>
+      <link>http://www.dino.codes/posts/python-tuple-syntax-is-confusing/</link>
+      <pubDate>Mon, 23 Dec 2019 12:41:57 +0000</pubDate>
+      
+      <guid>http://www.dino.codes/posts/python-tuple-syntax-is-confusing/</guid>
+      <description>How do you create a new list in Python?
+[&amp;#34;this is a list&amp;#34;] How do you create a new set in Python?
+{&amp;#34;this is a set&amp;#34;} How do you create a new tuple in Python?
+(&amp;#34;sorry! this is not a tuple&amp;#34;) Yup, unfortunately the way you create a one element tuple does not conform with the rest of the data structures in Python which you can create using &amp;ldquo;special&amp;rdquo; characters.</description>
+    </item>
     
     <item>
       <title>Elixir Findings: Asynchronous Task Streams</title>
