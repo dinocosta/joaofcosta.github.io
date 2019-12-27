@@ -17,9 +17,8 @@
       <pubDate>Mon, 23 Dec 2019 12:41:57 +0000</pubDate>
       
       <guid>http://www.dino.codes/posts/python-tuple-syntax-is-confusing/</guid>
-      <description>How do you create a new list in Python?
-[&amp;#34;this is a list&amp;#34;] How do you create a new set in Python?
-{&amp;#34;this is a set&amp;#34;} How do you create a new tuple in Python?
+      <description>Creating a list or a set with only one element, in Python, is pretty straight forward:
+# one element list. [&amp;#34;this is a list&amp;#34;] # one element set. {&amp;#34;this is a set&amp;#34;} However, that&amp;rsquo;s not the case if you want to create a tuple with only one element:
 (&amp;#34;sorry! this is not a tuple&amp;#34;) Yup, unfortunately the way you create a one element tuple does not conform with the rest of the data structures in Python which you can create using &amp;ldquo;special&amp;rdquo; characters.</description>
     </item>
     

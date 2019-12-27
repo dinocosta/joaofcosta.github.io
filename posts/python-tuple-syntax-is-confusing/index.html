@@ -7,6 +7,14 @@
     name="description"
     content="Post about how Python&#39;s tuple syntax can make you run around bugs that are easily avoided.">
 
+
+  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="dino.codes" />
+  <meta name="twitter:title" content="Small Island Developing States Photo Submission" />
+  <meta name="twitter:description" content="View the album on Flickr." />
+  <meta name="twitter:image" content="https://farm6.staticflickr.com/5510/14338202952_93595258ff_z.jpg" />
+
   <meta name="generator" content="Hugo 0.55.6" />
 
   
@@ -58,11 +66,13 @@
   <time datetime=2019-12-23T12:41:57Z class="post-date">Mon, Dec 23, 2019</time>
   
 
-<p>How do you create a new list in Python?</p>
-<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">[</span><span style="color:#d88200">&#34;this is a list&#34;</span><span style="color:#111">]</span></code></pre></div>
-<p>How do you create a new set in Python?</p>
-<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">{</span><span style="color:#d88200">&#34;this is a set&#34;</span><span style="color:#111">}</span></code></pre></div>
-<p>How do you create a new tuple in Python?</p>
+<p>Creating a list or a set with only one element, in Python, is pretty straight forward:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># one element list.</span>
+<span style="color:#111">[</span><span style="color:#d88200">&#34;this is a list&#34;</span><span style="color:#111">]</span>
+
+<span style="color:#75715e"># one element set.</span>
+<span style="color:#111">{</span><span style="color:#d88200">&#34;this is a set&#34;</span><span style="color:#111">}</span></code></pre></div>
+<p>However, that&rsquo;s not the case if you want to create a tuple with only one element:</p>
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">(</span><span style="color:#d88200">&#34;sorry! this is not a tuple&#34;</span><span style="color:#111">)</span></code></pre></div>
 <p>Yup, unfortunately the way you create a one element tuple does not conform with
 the rest of the data structures in Python which you can create using &ldquo;special&rdquo; characters.</p>
