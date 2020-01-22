@@ -6,10 +6,21 @@
     <description>Recent content on dino (dot) codes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 23 Dec 2019 12:41:57 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 07 Jan 2020 16:19:41 +0000</lastBuildDate>
     
 	<atom:link href="http://www.dino.codes/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>How to make Twitter preview your website links</title>
+      <link>http://www.dino.codes/posts/creating-twitter-cards/</link>
+      <pubDate>Tue, 07 Jan 2020 16:19:41 +0000</pubDate>
+      
+      <guid>http://www.dino.codes/posts/creating-twitter-cards/</guid>
+      <description>If you use Twitter you may have already seen a URL tweeted like this:
+However, you&amp;rsquo;ve also probably noticed not every tweet with a URL appears that way. That&amp;rsquo;s because not all websites support Twitter Cards .
+In short, Twitter Cards let you display links more richly, by displaying a card with more useful information than a simple URL. And the good news is, if you&amp;rsquo;re a website owner it&amp;rsquo;s very easy to update your website so that Twitter can display Twitter Cards for your website.</description>
+    </item>
     
     <item>
       <title>Python Tuple Syntax Is Confusing</title>

@@ -5,14 +5,14 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta
     name="description"
-    content="Blogpost on how to update your blog so that whenever you tweet about it Twitter displays a card.">
+    content="Blogpost on how to update your website so that whenever you tweet about it Twitter displays a preview of the content.">
 
 
   
-  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:card" content="summary" />
   <meta name="twitter:site" content="@joaofcosta" />
-  <meta name="twitter:title" content="Creating Twitter Cards" />
-  <meta name="twitter:description" content="Blogpost on how to update your blog so that whenever you tweet about it Twitter displays a card." />
+  <meta name="twitter:title" content="How to make Twitter preview your website links" />
+  <meta name="twitter:description" content="Blogpost on how to update your website so that whenever you tweet about it Twitter displays a preview of the content." />
   <meta name="twitter:image" content="https://i.imgur.com/ilEldyU.jpg" />
 
   <meta name="generator" content="Hugo 0.55.6" />
@@ -20,7 +20,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Creating Twitter Cards &middot; dino (dot) codes</title>
+  <title>How to make Twitter preview your website links &middot; dino (dot) codes</title>
 
   
   <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/print.css" media="print">
@@ -62,13 +62,121 @@
 
     <main class="content container">
     <div class="post">
-  <h1>Creating Twitter Cards</h1>
+  <h1>How to make Twitter preview your website links</h1>
   <time datetime=2020-01-07T16:19:41Z class="post-date">Tue, Jan 7, 2020</time>
-  <p>If you use Twitter it&rsquo;s possible you&rsquo;ve already seen a Tweet like this:</p>
+  
+
+<p>If you use Twitter you may have already seen a URL tweeted like this:</p>
 
 <p><img src="/twitter_card_summary.png" alt="Twitter Card Summary" /></p>
 
-<p><a href="https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/abouts-cards">https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/abouts-cards</a></p>
+<p>However, you&rsquo;ve also probably noticed not every tweet with a URL appears that
+way. That&rsquo;s because not all websites support <a href="https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/abouts-cards">Twitter
+Cards</a>
+.</p>
+
+<p>In short, Twitter Cards let you display links more richly, by displaying a card
+with more useful information than a simple URL. And the good news is, if you&rsquo;re
+a website owner it&rsquo;s very easy to update your website so that Twitter can
+display Twitter Cards for your website.</p>
+
+<p>There are multiple types of cards you can use, namely:</p>
+
+<ul>
+<li><a href="https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/summary">Summary</a></li>
+<li><a href="https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/summary-card-with-large-image">Summary With Large Image</a></li>
+<li><a href="https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/app-card">App</a></li>
+<li><a href="https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/player-card">Player</a></li>
+</ul>
+
+<p>In this blog post, I&rsquo;m going to cover how to enable your website&rsquo;s links to
+display summary cards but the knowledge should apply to all of the types of
+cards, you&rsquo;ll just need to check the specific documentation for the type you&rsquo;re
+using.</p>
+
+<h2 id="meta-header-tags">Meta Header Tags</h2>
+
+<p>For Twitter to be able to display a URL as a card there needs to be
+specific <code>meta</code> tags in the HTML header for that page. In our case, since we&rsquo;re
+using the summary card, these are the meta tags we need to setup:</p>
+
+<ul>
+<li><code>twitter:card</code> - Type of card to be used, we&rsquo;ll set this to <code>&quot;summary&quot;</code></li>
+<li><code>twitter:title</code> - The title to be displayed in the card.</li>
+<li><code>twitter:site</code> - The Twitter @username the card should be attributed to. In
+this case, I used my website domain.</li>
+<li><code>twitter:description</code> - A description, summarising the content of the URL.</li>
+<li><code>twitter:image</code> - The URL for the image to be displayed on the card.</li>
+</ul>
+
+<p>Note that only <code>twitter:card</code> and <code>twitter:title</code> are required for this to
+work, but for the sake of completeness, and user-friendliness, I&rsquo;m also
+going to use the rest of the tags.</p>
+
+<p>Here&rsquo;s how these tags look like in the final HTML file:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#111">&lt;</span><span style="color:#f92672">html</span><span style="color:#111">&gt;</span>
+    <span style="color:#111">&lt;</span><span style="color:#f92672">head</span><span style="color:#111">&gt;</span>
+        <span style="color:#111">&lt;</span><span style="color:#f92672">meta</span> <span style="color:#75af00">name</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;twitter:card&#34;</span> <span style="color:#75af00">content</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;summary&#34;</span><span style="color:#111">&gt;</span>
+        <span style="color:#111">&lt;</span><span style="color:#f92672">meta</span> <span style="color:#75af00">name</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;twitter:site&#34;</span> <span style="color:#75af00">content</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;@joaofcosta&#34;</span><span style="color:#111">&gt;</span>
+        <span style="color:#111">&lt;</span><span style="color:#f92672">meta</span> <span style="color:#75af00">name</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;twitter:image&#34;</span>
+          <span style="color:#75af00">content</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;https://i.imgur.com/ilEldyU.jpg&#34;</span><span style="color:#111">&gt;</span>
+        <span style="color:#111">&lt;</span><span style="color:#f92672">meta</span> <span style="color:#75af00">name</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;twitter:title&#34;</span>
+          <span style="color:#75af00">content</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;Python Tuple Syntax Is Confusing&#34;</span><span style="color:#111">&gt;</span>
+        <span style="color:#111">&lt;</span><span style="color:#f92672">meta</span> <span style="color:#75af00">name</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;twitter:description&#34;</span>
+          <span style="color:#75af00">content</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;Post about how Python&#39;s tuple syntax
+</span><span style="color:#d88200">            can make you run around trying to fix bugs
+</span><span style="color:#d88200">            that are easily avoided.&#34;</span><span style="color:#111">&gt;</span>
+        ...
+    <span style="color:#111">&lt;/</span><span style="color:#f92672">head</span><span style="color:#111">&gt;</span>
+    <span style="color:#111">&lt;</span><span style="color:#f92672">body</span><span style="color:#111">&gt;</span>
+        ...
+    <span style="color:#111">&lt;/</span><span style="color:#f92672">body</span><span style="color:#111">&gt;</span>
+<span style="color:#111">&lt;/</span><span style="color:#f92672">html</span><span style="color:#111">&gt;</span></code></pre></div>
+<p>With the setup above, here&rsquo;s how your that page&rsquo;s URL will appear whenever
+it is tweeted:</p>
+
+<p><img src="/twitter_card_summary_legend.png" alt="Rendered Summary Card" /></p>
+
+<p>Comparing that with tweeting only the URL you can see that it&rsquo;s much more
+attention-grabbing and also allows the user to quickly infer what the URL is
+about by using the description, it&rsquo;s a win-win!</p>
+
+<p>If you wish for the image to be bigger you can also use the
+<code>summary_large_image</code> value, instead of <code>summary</code>, for the <code>twitter:card</code>
+meta tag. In that case, the URL would be displayed like this:</p>
+
+<p><img src="/twitter_card_summary_with_large_image_legend.png" alt="Rendered Summary With Large Image
+Card" /></p>
+
+<p>The Twitter Card is now bigger and the image is now the main focus of
+attention but the user is still able to capture information from the
+description.</p>
+
+<h2 id="testing">Testing</h2>
+
+<p>If you decide to update your website&rsquo;s HTML so that Twitter can display these
+types of cards you might be wondering how you can test that everything is set up
+correctly.</p>
+
+<p>Luckily, Twitter provides a
+<a href="https://cards-dev.twitter.com/validator">Twitter&rsquo;s Card Validator</a> where you can easily plug
+the URL you&rsquo;d be sharing and it&rsquo;ll render a preview of the card that would be
+displayed, or not, were the URL to be shared.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I think anyone that uses Twitter regularly can attest that it is
+way better to see a Twitter Card for a website than a URL on a
+Tweet.</p>
+
+<p>As such, if you&rsquo;re the owner of a website, and usually share links to that same
+website, I think it&rsquo;s a worthwhile investment to update your website to include
+these meta tags, it&rsquo;s something really quick and easy to do that will probably
+gather more visits to your website.</p>
+
+<p>Finally, if you end up getting stuck on something or wish to know more on how
+to use Twitter Cards check out <a href="https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/abouts-cards">Twitter&rsquo;s Developer Documentation on Twitter
+Cards</a>.</p>
 
 </div>
 
