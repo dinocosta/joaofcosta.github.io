@@ -11,16 +11,16 @@
   
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:site" content="@joaofcosta" />
-  <meta name="twitter:title" content="Mocking Asynchronous Functions Python" />
+  <meta name="twitter:title" content="Mocking Asynchronous Functions In Python" />
   <meta name="twitter:description" content="Post on how to mock asynchronous (asyncio) functions in Python using pytest." />
   <meta name="twitter:image" content="https://i.imgur.com/ilEldyU.jpg" />
 
-  <meta name="generator" content="Hugo 0.55.6" />
+  <meta name="generator" content="Hugo 0.65.3" />
 
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Mocking Asynchronous Functions Python &middot; dino (dot) codes</title>
+  <title>Mocking Asynchronous Functions In Python &middot; dino (dot) codes</title>
 
   
   <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/print.css" media="print">
@@ -62,55 +62,49 @@
 
     <main class="content container">
     <div class="post">
-  <h1>Mocking Asynchronous Functions Python</h1>
+  <h1>Mocking Asynchronous Functions In Python</h1>
   <time datetime=2020-02-18T22:12:15Z class="post-date">Tue, Feb 18, 2020</time>
-  
-
-<h3 id="introduction">Introduction</h3>
-
+  <h3 id="introduction">Introduction</h3>
 <p>You might have already heard about Python&rsquo;s <code>asyncio</code> module, it allows you to easily run concurrent
 code using Python.
 In the last few months I&rsquo;ve worked in some codebases which take advantage of the benefits of
-<code>asyncio</code>, mainly through the use of <a href="https://docs.aiohttp.org/en/stable/">aiohttp</a>.</p>
-
+<code>asyncio</code>, mainly through their use of <a href="https://docs.aiohttp.org/en/stable/">aiohttp</a>.</p>
 <p>When using <code>asyncio</code> you&rsquo;ll use the <code>async/await</code> keywords to both define and call
 asynchronous functions.
-This also means changes in the way you test your code because you can&rsquo;t simply call
-an asynchronous function by its name anymore, that will only return a coroutine object,
-you need to use the <code>await</code> keyword in order to actually schedule and run it.</p>
-
+This also means changes in the way you test your code because, unlike ordinary functions,
+asynchronous functions always return a coroutine object, which needs to be awaited, using the
+<code>await</code> keyword in order to actually schedule it, run it and get the actual return value.</p>
 <p>As such, let&rsquo;s take a quick look into how we can easily test asynchronous functions by leveraging
-<a href="https://docs.python.org/3/library/concurrent.futures.html">Futures</a>.</p>
-
-<h3 id="what-we-re-mocking">What we&rsquo;re mocking</h3>
-
-<p>In this example, we&rsquo;re going to be mocking a simple function with adds two integers, its parameters,
+<a href="https://docs.python.org/3/library/concurrent.futures.html">Futures</a> in Python 3.7 and
+<a href="https://docs.python.org/3/library/unittest.mock.html#unittest.mock.AsyncMock">AsyncMock</a>
+in Python 3.8</p>
+<h3 id="what-were-mocking">What we&rsquo;re mocking</h3>
+<p>In this example, we&rsquo;re going to be mocking a simple function which adds two integers, its parameters,
 while resorting to <code>asyncio.sleep</code> to simulate IO heavy tasks, for example, HTTP requests or a
 database calls.</p>
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">asyncio</span>
 
 <span style="color:#111">async</span> <span style="color:#00a8c8">def</span> <span style="color:#75af00">sum</span><span style="color:#111">(</span><span style="color:#111">x</span><span style="color:#111">,</span> <span style="color:#111">y</span><span style="color:#111">):</span>
     <span style="color:#111">await</span> <span style="color:#111">asyncio</span><span style="color:#f92672">.</span><span style="color:#111">sleep</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">)</span>
-    <span style="color:#00a8c8">return</span> <span style="color:#111">x</span> <span style="color:#f92672">+</span> <span style="color:#111">y</span></code></pre></div>
-<h3 id="mocking-it">Mocking it</h3>
-
+    <span style="color:#00a8c8">return</span> <span style="color:#111">x</span> <span style="color:#f92672">+</span> <span style="color:#111">y</span>
+</code></pre></div><h3 id="mocking-it">Mocking it</h3>
 <p>Asynchronous functions in Python return what&rsquo;s known as a <code>Future</code> object, which contains the
 result of calling the asynchronous function.
 As such, the &ldquo;secret&rdquo; to mocking these functions is to make the patched function return a
-<code>Future</code> object with the result we&rsquo;re expecting as one can see in the example below.</p>
-<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">pytest</span> <span style="color:#111">import</span> <span style="color:#111">asyncio</span>
+<code>Future</code> object with the result we&rsquo;re expecting, as one can see in the example below.</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">pytest</span>
+<span style="color:#f92672">import</span> <span style="color:#111">asyncio</span>
 
 <span style="color:#75af00">@pytest.fixture</span><span style="color:#111">()</span>
 <span style="color:#00a8c8">def</span> <span style="color:#75af00">mock_sum</span><span style="color:#111">(</span><span style="color:#111">mocker</span><span style="color:#111">):</span>
     <span style="color:#111">future</span> <span style="color:#f92672">=</span> <span style="color:#111">asyncio</span><span style="color:#f92672">.</span><span style="color:#111">Future</span><span style="color:#111">()</span>
     <span style="color:#111">future</span><span style="color:#f92672">.</span><span style="color:#111">set_result</span><span style="color:#111">(</span><span style="color:#ae81ff">4</span><span style="color:#111">)</span>
-    <span style="color:#111">mocker</span><span style="color:#f92672">.</span><span style="color:#111">patch</span><span style="color:#111">(</span><span style="color:#d88200">&#39;app.sum&#39;</span><span style="color:#111">,</span> <span style="color:#111">return_value</span><span style="color:#f92672">=</span><span style="color:#111">future</span><span style="color:#111">)</span></code></pre></div>
-<p>As you can see in the example above, we&rsquo;re creating a pytest fixture, namely <code>mock_sum</code> which
+    <span style="color:#111">mocker</span><span style="color:#f92672">.</span><span style="color:#111">patch</span><span style="color:#111">(</span><span style="color:#d88200">&#39;app.sum&#39;</span><span style="color:#111">,</span> <span style="color:#111">return_value</span><span style="color:#f92672">=</span><span style="color:#111">future</span><span style="color:#111">)</span>
+</code></pre></div><p>As you can see in the example above, we&rsquo;re creating a pytest fixture, namely <code>mock_sum</code> that
 patches the function we created at the beginning of the post and specifies that the function call
 will return a <code>Future</code> object, with a result of <code>4</code>.
 In your own tests you will, of course, need to change the call to <code>set_result</code> to return whatever
-result you&rsquo;re expecting, maybe a HTTP request or some database query result.</p>
-
+value you&rsquo;re expecting, maybe a HTTP response or some database query result.</p>
 <p>With this done we can now create a simple test case that tests the <code>sum</code> function:</p>
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">pytest</span> <span style="color:#111">import</span> <span style="color:#111">asyncio</span>
 
@@ -118,9 +112,8 @@ result you&rsquo;re expecting, maybe a HTTP request or some database query resul
 <span style="color:#111">async</span> <span style="color:#00a8c8">def</span> <span style="color:#75af00">test_sum</span><span style="color:#111">(</span><span style="color:#111">mock_sum</span><span style="color:#111">):</span>
     <span style="color:#111">result</span> <span style="color:#f92672">=</span> <span style="color:#111">await</span> <span style="color:#111">sum</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#ae81ff">2</span><span style="color:#111">)</span>
     <span style="color:#75715e"># I know 1+2 is equal to 3 but one man can only dream!</span>
-    <span style="color:#00a8c8">assert</span> <span style="color:#111">result</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">4</span></code></pre></div>
-<p>There&rsquo;s also a few different things happening here when compared to a regular test function:</p>
-
+    <span style="color:#00a8c8">assert</span> <span style="color:#111">result</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">4</span>
+</code></pre></div><p>There&rsquo;s also a few different things happening here when compared to a regular test function:</p>
 <ul>
 <li><code>@pytest.mark.asyncio</code> decorator - This tells pytest that this is an asynchronous test function,
 otherwise pytest will skip it.</li>
@@ -128,22 +121,82 @@ otherwise pytest will skip it.</li>
 calls the pytest fixture, <code>mock_sum</code>, so that it successfully mocks the <code>sum</code> function&rsquo;s result.</li>
 <li><code>result = await sum(1,2)</code> - Correctly calls the asynchronous function using the <code>await</code> keyword.</li>
 </ul>
-
 <p>Although <code>1 + 2</code> is equal to <code>3</code> I&rsquo;m purposefully asserting that this returns <code>4</code> so as to make sure
 that the fixture is indeed called.
 If you go ahead and run <code>pytest</code> now with the code shown above you should see that indeed it
 executes successfully, passing the tests.</p>
+<p>However, imagine that you want to mock the <code>sum</code> function multiple times while having a different
+value provided to <code>set_result</code> in the <code>Future</code> object. It doesn&rsquo;t make sense to create multiple
+fixtures since we&rsquo;ll be repeatedly patching the same function. In this case we&rsquo;ll return the
+<code>Future</code> object and call the <code>set_result</code> function in the test function, thus,
+our fixture we&rsquo;ll now look like:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">pytest</span>
+<span style="color:#f92672">import</span> <span style="color:#111">asyncio</span>
 
+<span style="color:#75af00">@pytest.fixture</span><span style="color:#111">()</span>
+<span style="color:#00a8c8">def</span> <span style="color:#75af00">mock_sum</span><span style="color:#111">(</span><span style="color:#111">mocker</span><span style="color:#111">):</span>
+    <span style="color:#111">future</span> <span style="color:#f92672">=</span> <span style="color:#111">asyncio</span><span style="color:#f92672">.</span><span style="color:#111">Future</span><span style="color:#111">()</span>
+    <span style="color:#111">mocker</span><span style="color:#f92672">.</span><span style="color:#111">patch</span><span style="color:#111">(</span><span style="color:#d88200">&#39;app.sum&#39;</span><span style="color:#111">,</span> <span style="color:#111">return_value</span><span style="color:#f92672">=</span><span style="color:#111">future</span><span style="color:#111">)</span>
+    <span style="color:#00a8c8">return</span> <span style="color:#111">future</span>
+</code></pre></div><p>Notice that we&rsquo;re not calling <code>set_result</code> in the fixture this time around. With the updated
+fixture we now need to update the test function to look like this:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">pytest</span>
+<span style="color:#f92672">import</span> <span style="color:#111">app</span>
+
+<span style="color:#75af00">@pytest.mark.asyncio</span>
+<span style="color:#111">async</span> <span style="color:#00a8c8">def</span> <span style="color:#75af00">test_sum</span><span style="color:#111">(</span><span style="color:#111">mock_sum</span><span style="color:#111">):</span>
+    <span style="color:#111">mock_sum</span><span style="color:#f92672">.</span><span style="color:#111">set_result</span><span style="color:#111">(</span><span style="color:#ae81ff">4</span><span style="color:#111">)</span>
+    <span style="color:#111">result</span> <span style="color:#f92672">=</span> <span style="color:#111">await</span> <span style="color:#111">app</span><span style="color:#f92672">.</span><span style="color:#111">sum</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#ae81ff">2</span><span style="color:#111">)</span>
+    <span style="color:#75715e"># I know 1+2 is equal to 3 but one man can only dream!</span>
+    <span style="color:#00a8c8">assert</span> <span style="color:#111">result</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">4</span>
+</code></pre></div><p>Finally, notice now how we&rsquo;re calling <code>mock_sum.set_result(4)</code>. If we want the mock to return
+different values we now just need to change the value provided to <code>set_result</code> instead of having to
+create multiple fixture for different tests!</p>
+<h3 id="mocking-it-in-python-38">Mocking It In Python 3.8</h3>
+<p>The code above only works for versions of Python &lt;3.8. In Python 3.8 we need to change the code
+slightly because
+<a href="https://docs.python.org/3.8/library/unittest.mock.html#unittest.mock.AsyncMock"><code>AsyncMock</code></a> has
+been introduced.</p>
+<p>With that said, we can simply change the mocking function to return the <code>AsyncMock</code> instance instead
+of the <code>Future</code> instance.</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> <span style="color:#111">unittest.mock</span> <span style="color:#f92672">import</span> <span style="color:#111">AsyncMock</span>
+
+<span style="color:#75af00">@pytest.fixture</span><span style="color:#111">()</span>
+<span style="color:#00a8c8">def</span> <span style="color:#75af00">mock_sum</span><span style="color:#111">(</span><span style="color:#111">mocker</span><span style="color:#111">):</span>
+    <span style="color:#111">async_mock</span> <span style="color:#f92672">=</span> <span style="color:#111">AsyncMock</span><span style="color:#111">(</span><span style="color:#111">return_value</span><span style="color:#f92672">=</span><span style="color:#ae81ff">4</span><span style="color:#111">)</span>
+    <span style="color:#111">mocker</span><span style="color:#f92672">.</span><span style="color:#111">patch</span><span style="color:#111">(</span><span style="color:#d88200">&#39;app.sum&#39;</span><span style="color:#111">,</span> <span style="color:#111">side_effect</span><span style="color:#f92672">=</span><span style="color:#111">async_mock</span><span style="color:#111">)</span>
+</code></pre></div><p>As you can see in the code above, the main change is that the return value is now set as an
+<code>AsyncMock</code> instance instead of a <code>Future</code> instance, and we can also now use the <code>return_value</code>
+argument in the <code>AsyncMock</code> instantiation instead of needing to call a function afterwards to set
+its result.</p>
+<p>With the code above our test function will look like the first showed in this blog post, where we
+don&rsquo;t change the result of the mock. However, as we did in the end of the previous section, if we
+need to mock the same function multiple times while having different results it&rsquo;s better if we
+just return the <code>AsyncMock</code> instance from the fixture and set the <code>return_value</code> in the test
+function. As such, our fixture would now look like this:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> <span style="color:#111">unittest.mock</span> <span style="color:#f92672">import</span> <span style="color:#111">AsyncMock</span>
+
+<span style="color:#75af00">@pytest.fixture</span><span style="color:#111">()</span>
+<span style="color:#00a8c8">def</span> <span style="color:#75af00">mock_sum</span><span style="color:#111">(</span><span style="color:#111">mocker</span><span style="color:#111">):</span>
+    <span style="color:#111">async_mock</span> <span style="color:#f92672">=</span> <span style="color:#111">AsyncMock</span><span style="color:#111">()</span>
+    <span style="color:#111">mocker</span><span style="color:#f92672">.</span><span style="color:#111">patch</span><span style="color:#111">(</span><span style="color:#d88200">&#39;app.sum&#39;</span><span style="color:#111">,</span> <span style="color:#111">side_effect</span><span style="color:#f92672">=</span><span style="color:#111">async_mock</span><span style="color:#111">)</span>
+    <span style="color:#00a8c8">return</span> <span style="color:#111">async_mock</span>
+</code></pre></div><p>And with this fixture we could simply update our test function to the following:</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75af00">@pytest.mark.asyncio</span>
+<span style="color:#111">async</span> <span style="color:#00a8c8">def</span> <span style="color:#75af00">test_sum</span><span style="color:#111">(</span><span style="color:#111">mock_sum</span><span style="color:#111">):</span>
+    <span style="color:#111">mock_sum</span><span style="color:#f92672">.</span><span style="color:#111">return_value</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>
+    <span style="color:#111">result</span> <span style="color:#f92672">=</span> <span style="color:#111">await</span> <span style="color:#111">app</span><span style="color:#f92672">.</span><span style="color:#111">sum</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#ae81ff">2</span><span style="color:#111">)</span>
+    <span style="color:#00a8c8">assert</span> <span style="color:#111">result</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">4</span>
+</code></pre></div><p>Notice that the only change compared to the previous section is that we now set the <code>return_value</code>
+attribute of the mock instead of calling the <code>set_result</code> function seeing as we&rsquo;re now working with
+<code>AsyncMock</code> instead of <code>Future</code>. Aside that, the test function looks exactly the same.</p>
 <h3 id="conclusion">Conclusion</h3>
-
-<p>In conclusion mocking asynchronous in Python is actually easier than I expected at first, mostly
-because I didn&rsquo;t really understood how asyncio worked. After some reading and experimentation it
-turns out it&rsquo;s quick and easy to do, and it allows you to run concurrent tests, which should speed
-up your test suite.</p>
-
+<p>In conclusion mocking asynchronous functions in Python is actually easier than I expected at first,
+mostly because I didn&rsquo;t really understood how asyncio worked. After some reading and experimentation
+it turns out it&rsquo;s quick and easy to do, and it allows you to run concurrent tests, which should
+speed up your test suite!</p>
 <p>If you&rsquo;re reading this for a quick solution and don&rsquo;t really known what&rsquo;s going on I&rsquo;d advise
 <a href="https://realpython.com/async-io-python/">reading up on asyncio</a>.</p>
-
 <p>I hope this blogpost has helped you! 👋</p>
 
 </div>

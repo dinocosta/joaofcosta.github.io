@@ -15,7 +15,7 @@
   <meta name="twitter:description" content="Thoughts and opinions on Software Development and Music Production." />
   <meta name="twitter:image" content="https://i.imgur.com/ilEldyU.jpg" />
 
-  <meta name="generator" content="Hugo 0.55.6" />
+  <meta name="generator" content="Hugo 0.65.3" />
 
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -66,7 +66,6 @@
   <time datetime=2019-07-26T18:34:44&#43;0100 class="post-date">Fri, Jul 26, 2019</time>
   <p>If you open an <code>iex</code> shell right now and type <code>i &quot;string&quot;</code> this is the result
 you&rsquo;ll get:</p>
-
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Term
   &#34;string&#34;
 Data type
@@ -82,9 +81,7 @@ Reference modules
 <span style="display:block;width:100%;background-color:#e1e1e1">  String, :binary
 </span>Implemented protocols
   Collectable, IEx.Info, Inspect, List.Chars, String.Chars</code></pre></div>
-
 <p>and if you type <code>i &lt;&lt;-1&gt;&gt;</code> you&rsquo;ll get the following output:</p>
-
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Term
   &lt;&lt;255&gt;&gt;
 Data type
@@ -99,32 +96,25 @@ Reference modules
 <span style="display:block;width:100%;background-color:#e1e1e1">  :binary
 </span>Implemented protocols
   Collectable, IEx.Info, Inspect, List.Chars, String.Chars</code></pre></div>
-
 <p>If you&rsquo;ve noticed the highlighted lines you&rsquo;ll see that although the Data
 Type value is the same for both, <code>BitString</code>, the Reference Modules value
 is different. For <code>&quot;string&quot;</code> we have both <code>String</code> and <code>:binary</code> as reference
 modules, while for <code>&lt;&lt;-1&gt;&gt;</code>, we only have <code>:binary</code> as a reference module.</p>
-
 <p>In short, strings in Elixir are always binaries, but not all binaries can be
 strings.</p>
-
 <p>It may sometimes be useful to tell one apart from the other. I&rsquo;m currently
 working on a library which implements the OSC protocol in Elixir and,
 depending on if the binary can be a string or not, it will either be encoded
 as an OSC String or as an OSC Blob, respectively.</p>
-
 <p>So, in order to tell if a given binary can be a string you can simply use
 <code>String.valid?/1</code>. Let&rsquo;s test it with the two examples showed at the beginning
 of the post, <code>&quot;string&quot;</code> and <code>&lt;&lt;-1&gt;&gt;</code>:</p>
-
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">iex</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">)</span><span style="color:#f92672">&gt;</span> <span style="color:#75af00">String</span><span style="color:#f92672">.</span><span style="color:#111">valid?</span><span style="color:#111">(</span><span style="color:#d88200">&#34;string&#34;</span><span style="color:#111">)</span>
 <span style="color:#111">true</span>
 <span style="color:#111">iex</span><span style="color:#111">(</span><span style="color:#ae81ff">2</span><span style="color:#111">)</span><span style="color:#f92672">&gt;</span> <span style="color:#75af00">String</span><span style="color:#f92672">.</span><span style="color:#111">valid?</span><span style="color:#111">(&lt;&lt;</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span><span style="color:#111">&gt;&gt;)</span>
 <span style="color:#111">false</span></code></pre></div>
-
 <p>As expected, <code>&quot;string&quot;</code>, or <code>&lt;&lt;115, 116, 114, 105, 110, 103&gt;&gt;</code> in binary, is
 a valid string, however <code>&lt;&lt;-1&gt;&gt;</code> is not.</p>
-
 <p>And now we know how to tell strings apart from binaries in Elixir.</p>
 
 </div>
