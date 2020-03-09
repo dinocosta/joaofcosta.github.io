@@ -6,10 +6,20 @@
     <description>Recent content on dino (dot) codes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 07 Jan 2020 16:19:41 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 18 Feb 2020 22:12:15 +0000</lastBuildDate>
     
 	<atom:link href="http://www.dino.codes/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Mocking Asynchronous Functions In Python</title>
+      <link>http://www.dino.codes/posts/mocking-asynchronous-functions-python/</link>
+      <pubDate>Tue, 18 Feb 2020 22:12:15 +0000</pubDate>
+      
+      <guid>http://www.dino.codes/posts/mocking-asynchronous-functions-python/</guid>
+      <description>Introduction You might have already heard about Python&amp;rsquo;s asyncio module, it allows you to easily run concurrent code using Python. In the last few months I&amp;rsquo;ve worked in some codebases which take advantage of the benefits of asyncio, mainly through their use of aiohttp.
+When using asyncio you&amp;rsquo;ll use the async/await keywords to both define and call asynchronous functions. This also means changes in the way you test your code because, unlike ordinary functions, asynchronous functions always return a coroutine object, which needs to be awaited, using the await keyword in order to actually schedule it, run it and get the actual return value.</description>
+    </item>
     
     <item>
       <title>How to make Twitter preview your website links</title>
