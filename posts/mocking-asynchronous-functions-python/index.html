@@ -1,72 +1,85 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<html>
 <head>
-  <link href="//gmpg.org/xfn/11" rel="profile">
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta
-    name="description"
-    content="Post on how to mock asynchronous (asyncio) functions in Python.">
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Mocking Asynchronous Functions In Python - dino (dot) codes</title><link rel="icon" type="image/png" href=static/favicon.ico /><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:title" content="Mocking Asynchronous Functions In Python" />
+<meta property="og:description" content="Post on how to mock asynchronous (asyncio) functions in Python." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://www.dino.codes/posts/mocking-asynchronous-functions-python/" />
 
+<meta property="og:image" content="http://www.dino.codes/favicon.ico" />
+<meta property="article:published_time" content="2020-02-18T22:12:15+00:00" />
+<meta property="article:modified_time" content="2020-02-18T22:12:15+00:00" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://www.dino.codes/favicon.ico"/>
 
-  
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="@joaofcosta" />
-  <meta name="twitter:title" content="Mocking Asynchronous Functions In Python" />
-  <meta name="twitter:description" content="Post on how to mock asynchronous (asyncio) functions in Python." />
-  <meta name="twitter:image" content="https://i.imgur.com/ilEldyU.jpg" />
+<meta name="twitter:title" content="Mocking Asynchronous Functions In Python"/>
+<meta name="twitter:description" content="Post on how to mock asynchronous (asyncio) functions in Python."/>
+<link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" media="screen" href="http://www.dino.codes/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="http://www.dino.codes/css/main.css" />
+		<link rel="stylesheet" type="text/css" href="http://www.dino.codes/css/custom.css" />
+	
 
-  <meta name="generator" content="Hugo 0.56.3" />
-
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Mocking Asynchronous Functions In Python &middot; dino (dot) codes</title>
-
-  
-  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/print.css" media="print">
-  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/poole.css">
-  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/syntax.css">
-  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/hyde.css">
-  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/override.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro|Playfair+Display|Fira+Mono">
-
-
-  
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
-  <link rel="shortcut icon" href="/favicon.ico">
-
-  
-  
+	<script src="http://www.dino.codes/js/feather.min.js"></script>
+	
+		<script src="http://www.dino.codes/js/main.js"></script>
 </head>
 
-  <body class=" ">
-  <aside class="sidebar">
-  <div class="container sidebar-sticky">
-    <div class="sidebar-about">
-      <a href="http://www.dino.codes/"><h1>dino (dot) codes</h1></a>
-      <p class="lead">
-       Thoughts and opinions on Software Development and Music Production. 
-      </p>
-    </div>
+<body>
+	<div class="container wrapper">
+		<div class="header">
+	
+	<h1 class="site-title"><a href="http://www.dino.codes/">dino (dot) codes</a></h1>
+	<div class="site-description"><p>Thoughts and opinions on Software Development and Music Production.</p><nav class="nav social">
+			<ul class="flat"><li><a href="https://soundcloud.com/dino-costa-180136083" title="Soundcloud"><i data-feather="music"></i></a></li><li><a href="https://twitter.com/joaofcosta_" title="Twitter"><i data-feather="twitter"></i></a></li><li><a href="https://github.com/joaofcosta/" title="Github"><i data-feather="github"></i></a></li></ul>
+		</nav>
+	</div>
 
-    <nav>
-      <ul class="sidebar-nav">
-        <li><a href="http://www.dino.codes/">Home</a> </li>
-        <li><a href="https://github.com/joaofcosta/"> Github </a></li><li><a href="https://medium.com/@dinojoaocosta"> Medium </a></li><li><a href="https://soundcloud.com/dino-costa-180136083"> Soundcloud </a></li><li><a href="https://twitter.com/joaofcosta_"> Twitter </a></li>
-      </ul>
-    </nav>
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">Posts</a>
+			</li>
+			
+			<li>
+				<a href="/about">About</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
+</div>
 
-    <p>&copy; 2020. All rights reserved. </p>
-  </div>
-</aside>
 
-    <main class="content container">
-    <div class="post">
-  <h1>Mocking Asynchronous Functions In Python</h1>
-  <time datetime=2020-02-18T22:12:15Z class="post-date">Tue, Feb 18, 2020</time>
-  
+		<div class="post">
+			<div class="post-header post-header-block">
+				<div class="matter">
+					<h1 class="title">Mocking Asynchronous Functions In Python</h1>
+				</div>
+				
+					<div class="meta">
+						<div>
+							<span>18</span>
+							<span>Feb, 2020</span>
+						</div>
+					</div>
+				
+			</div>
 
-<h3 id="introduction">Introduction</h3>
+			<div class="markdown">
+				
+
+<h2 id="introduction">Introduction</h2>
 
 <p>You might have already heard about Python&rsquo;s <code>asyncio</code> module, it allows you to easily run concurrent
 code using Python.
@@ -84,7 +97,7 @@ asynchronous functions always return a coroutine object, which needs to be await
 <a href="https://docs.python.org/3/library/unittest.mock.html#unittest.mock.AsyncMock">AsyncMock</a>
 in Python 3.8</p>
 
-<h3 id="what-we-re-mocking">What we&rsquo;re mocking</h3>
+<h2 id="what-we-re-mocking">What we&rsquo;re mocking</h2>
 
 <p>In this example, we&rsquo;re going to be mocking a simple function which adds two integers, its parameters,
 while resorting to <code>asyncio.sleep</code> to simulate IO heavy tasks, for example, HTTP requests or a
@@ -94,7 +107,7 @@ database calls.</p>
 <span style="color:#111">async</span> <span style="color:#00a8c8">def</span> <span style="color:#75af00">sum</span><span style="color:#111">(</span><span style="color:#111">x</span><span style="color:#111">,</span> <span style="color:#111">y</span><span style="color:#111">):</span>
     <span style="color:#111">await</span> <span style="color:#111">asyncio</span><span style="color:#f92672">.</span><span style="color:#111">sleep</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">)</span>
     <span style="color:#00a8c8">return</span> <span style="color:#111">x</span> <span style="color:#f92672">+</span> <span style="color:#111">y</span></code></pre></div>
-<h3 id="mocking-it">Mocking it</h3>
+<h2 id="mocking-it">Mocking it</h2>
 
 <p>Asynchronous functions in Python return what&rsquo;s known as a <code>Future</code> object, which contains the
 result of calling the asynchronous function.
@@ -165,7 +178,7 @@ fixture we now need to update the test function to look like this:</p>
 different values we now just need to change the value provided to <code>set_result</code> instead of having to
 create multiple fixture for different tests!</p>
 
-<h3 id="mocking-it-in-python-3-8">Mocking It In Python 3.8</h3>
+<h2 id="mocking-it-in-python-3-8">Mocking It In Python 3.8</h2>
 
 <p>The code above only works for versions of Python &lt;3.8. In Python 3.8 we need to change the code
 slightly because
@@ -207,7 +220,7 @@ function. As such, our fixture would now look like this:</p>
 attribute of the mock instead of calling the <code>set_result</code> function seeing as we&rsquo;re now working with
 <code>AsyncMock</code> instead of <code>Future</code>. Aside that, the test function looks exactly the same.</p>
 
-<h3 id="conclusion">Conclusion</h3>
+<h2 id="conclusion">Conclusion</h2>
 
 <p>In conclusion mocking asynchronous functions in Python is actually easier than I expected at first,
 mostly because I didn&rsquo;t really understood how asyncio worked. After some reading and experimentation
@@ -226,12 +239,27 @@ speed up your test suite!</p>
 <li><a href="https://news.ycombinator.com/item?id=22526405">Hackernews Discussion</a></li>
 </ul>
 
+			</div>
+
+			<div class="tags">
+				
+					
+						<ul class="flat">
+							
+							<li><a href="/tags/python">Python</a></li>
+							
+						</ul>
+					
+				
+			</div></div>
+	</div>
+	<div class="footer wrapper">
+	<nav class="nav">
+		<div> <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
 </div>
 
 
-    </main>
-
-    
 <script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
@@ -242,6 +270,6 @@ if (!doNotTrack) {
 }
 </script>
 <script async src='https://www.google-analytics.com/analytics.js'></script>
-
-  </body>
+<script>feather.replace()</script>
+</body>
 </html>

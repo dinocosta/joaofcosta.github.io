@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css?family=Playfair+Display:900|Source+Sans+Pro|Open+Sans|IBM+Plex+Mono');
+
+/* Color Definitions. Taken from https://www.happyhues.co/palettes/3. */
+:root {
+  --background-color: #fffffe;
+  --headline-color: #094067;
+  --paragraph-color: #5f6c7b;
+  --button-color: #3da9fc;
+  --button-text-color: #fffffe;
+  --stroke-color: #094067;
+  --main-color: #fffffe;
+  --highlight-color: #3da9fc;
+  --secondary-color: #90b4ce;
+  --tertiary-color: #ef4565;
+}
+
+
+body {
+  font-family: "Open Sans";
+  background-color: var(--background-color);
+  color: var(--paragraph-color);
+}
+
+/* Website title at the top of the page */
+h1.site-title > a {
+  color: var(--headline-color);
+}
+
+/* Headers */
+h1, h2, h3, h4, h5 {
+  font-family: "Playfair Display";
+  font-weight: 900;
+  color: var(--headline-color);
+}
+
+/* Post title in index page */
+h4.title > a {
+  color: var(--headline-color);
+}
+
+/* Links */
+a {
+  color: var(--tertiary-color);
+}
+
+a:hover {
+    border-bottom: 2px solid var(--tertiary-color);
+}
+
+/* Code Blocks */
+pre {
+  font-family: "IBM Plex Mono";
+}
+
+/* Text selection background color */
+::selection {
+  background: var(--tertiary-color);
+}
+
+/* Make sure date appears after title in post page */
+.post-header-block {
+  display: block;
+}
+
+/* Social Links in Website's header */
+.header nav.social a {
+    color: var(--headline-color);
+    transition:
+}
+
+.header nav.social a:hover {
+  color: var(--headline-color);
+}
+
+/* Tags at the bottom of the post page */
+.post .tags a {
+    color: var(--button-color);
+    border-color: var(--button-color);
+}

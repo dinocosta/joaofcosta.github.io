@@ -14,6 +14,18 @@
   </url>
   
   <url>
+    <loc>http://www.dino.codes/tags/python/</loc>
+    <lastmod>2020-02-18T22:12:15+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.dino.codes/tags/</loc>
+    <lastmod>2020-02-18T22:12:15+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.dino.codes/</loc>
     <lastmod>2020-02-18T22:12:15+00:00</lastmod>
     <priority>0</priority>
@@ -30,18 +42,14 @@
   </url>
   
   <url>
+    <loc>http://www.dino.codes/tags/elixir/</loc>
+    <lastmod>2019-07-24T09:56:13+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.dino.codes/posts/elixir-findings-asynchronous-task-streams/</loc>
     <lastmod>2019-07-24T09:56:13+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://www.dino.codes/categories/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://www.dino.codes/tags/</loc>
-    <priority>0</priority>
   </url>
   
 </urlset>

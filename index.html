@@ -1,124 +1,170 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<html>
 <head>
-  <link href="//gmpg.org/xfn/11" rel="profile">
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta
-    name="description"
-    content="Dino Costa's personal website. Thoughts and opinions on Software Development and Music Production.">
+	<meta name="generator" content="Hugo 0.56.3" />
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>dino (dot) codes - Thoughts and opinions on Software Development and Music Production. </title><link rel="icon" type="image/png" href=static/favicon.ico /><meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="alternate" type="application/rss+xml" href="http://www.dino.codes/index.xml" title="dino (dot) codes" />
+	<meta property="og:title" content="dino (dot) codes" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="http://www.dino.codes/" />
 
+<meta property="og:image" content="http://www.dino.codes/favicon.ico" />
 
-  
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="@joaofcosta" />
-  <meta name="twitter:title" content="" />
-  <meta name="twitter:description" content="Thoughts and opinions on Software Development and Music Production." />
-  <meta name="twitter:image" content="https://i.imgur.com/ilEldyU.jpg" />
+<meta property="og:updated_time" content="2020-02-18T22:12:15+00:00" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://www.dino.codes/favicon.ico"/>
 
-  <meta name="generator" content="Hugo 0.56.3" />
+<meta name="twitter:title" content="dino (dot) codes"/>
+<meta name="twitter:description" content=""/>
+<link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" media="screen" href="http://www.dino.codes/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="http://www.dino.codes/css/main.css" />
+		<link rel="stylesheet" type="text/css" href="http://www.dino.codes/css/custom.css" />
+	
 
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>dino (dot) codes</title>
-
-  
-  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/print.css" media="print">
-  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/poole.css">
-  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/syntax.css">
-  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/hyde.css">
-  <link type="text/css" rel="stylesheet" href="http://www.dino.codes/css/override.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro|Playfair+Display|Fira+Mono">
-
-
-  
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
-  <link rel="shortcut icon" href="/favicon.ico">
-
-  
-  <link href="http://www.dino.codes/index.xml" rel="alternate" type="application/rss+xml" title="dino (dot) codes" />
-  
+	<script src="http://www.dino.codes/js/feather.min.js"></script>
+	
+		<script src="http://www.dino.codes/js/main.js"></script>
 </head>
 
-  <body class=" ">
-  <aside class="sidebar">
-  <div class="container sidebar-sticky">
-    <div class="sidebar-about">
-      <a href="http://www.dino.codes/"><h1>dino (dot) codes</h1></a>
-      <p class="lead">
-       Thoughts and opinions on Software Development and Music Production. 
-      </p>
-    </div>
+<body>
+	<div class="container wrapper">
+		<div class="header">
+	
+	<h1 class="site-title"><a href="http://www.dino.codes/">dino (dot) codes</a></h1>
+	<div class="site-description"><p>Thoughts and opinions on Software Development and Music Production.</p><nav class="nav social">
+			<ul class="flat"><li><a href="https://soundcloud.com/dino-costa-180136083" title="Soundcloud"><i data-feather="music"></i></a></li><li><a href="https://twitter.com/joaofcosta_" title="Twitter"><i data-feather="twitter"></i></a></li><li><a href="https://github.com/joaofcosta/" title="Github"><i data-feather="github"></i></a></li></ul>
+		</nav>
+	</div>
 
-    <nav>
-      <ul class="sidebar-nav">
-        <li><a href="http://www.dino.codes/">Home</a> </li>
-        <li><a href="https://github.com/joaofcosta/"> Github </a></li><li><a href="https://medium.com/@dinojoaocosta"> Medium </a></li><li><a href="https://soundcloud.com/dino-costa-180136083"> Soundcloud </a></li><li><a href="https://twitter.com/joaofcosta_"> Twitter </a></li>
-      </ul>
-    </nav>
-
-    <p>&copy; 2020. All rights reserved. </p>
-  </div>
-</aside>
-
-    <main class="content container">
-    <div class="posts">
-<article class="post">
-  <h1 class="post-title">
-    <a href="http://www.dino.codes/posts/mocking-asynchronous-functions-python/">Mocking Asynchronous Functions In Python</a>
-  </h1>
-  <time datetime="2020-02-18T22:12:15Z" class="post-date">Tue, Feb 18, 2020</time>
-  Introduction You might have already heard about Python&rsquo;s asyncio module, it allows you to easily run concurrent code using Python. In the last few months I&rsquo;ve worked in some codebases which take advantage of the benefits of asyncio, mainly through their use of aiohttp.
-When using asyncio you&rsquo;ll use the async/await keywords to both define and call asynchronous functions. This also means changes in the way you test your code because, unlike ordinary functions, asynchronous functions always return a coroutine object, which needs to be awaited, using the await keyword in order to actually schedule it, run it and get the actual return value.
-  
-  <div class="read-more-link">
-    <a href="/posts/mocking-asynchronous-functions-python/">Read More…</a>
-  </div>
-  
-</article><article class="post">
-  <h1 class="post-title">
-    <a href="http://www.dino.codes/posts/creating-twitter-cards/">How to make Twitter preview your website links</a>
-  </h1>
-  <time datetime="2020-01-07T16:19:41Z" class="post-date">Tue, Jan 7, 2020</time>
-  If you use Twitter you may have already seen a URL tweeted like this:
-However, you&rsquo;ve also probably noticed not every tweet with a URL appears that way. That&rsquo;s because not all websites support Twitter Cards .
-In short, Twitter Cards let you display links more richly, by displaying a card with more useful information than a simple URL. And the good news is, if you&rsquo;re a website owner it&rsquo;s very easy to update your website so that Twitter can display Twitter Cards for your website.
-  
-  <div class="read-more-link">
-    <a href="/posts/creating-twitter-cards/">Read More…</a>
-  </div>
-  
-</article><article class="post">
-  <h1 class="post-title">
-    <a href="http://www.dino.codes/posts/python-tuple-syntax-is-confusing/">Python Tuple Syntax Is Confusing</a>
-  </h1>
-  <time datetime="2019-12-23T12:41:57Z" class="post-date">Mon, Dec 23, 2019</time>
-  Creating a list or a set with only one element, in Python, is pretty straight forward:
-# one element list. [&#34;this is a list&#34;] # one element set. {&#34;this is a set&#34;} However, that&rsquo;s not the case if you want to create a tuple with only one element:
-(&#34;sorry! this is not a tuple&#34;) Yup, unfortunately the way you create a one element tuple does not conform with the rest of the data structures in Python which you can create using &ldquo;special&rdquo; characters.
-  
-  <div class="read-more-link">
-    <a href="/posts/python-tuple-syntax-is-confusing/">Read More…</a>
-  </div>
-  
-</article><article class="post">
-  <h1 class="post-title">
-    <a href="http://www.dino.codes/posts/elixir-findings-asynchronous-task-streams/">Elixir Findings: Asynchronous Task Streams</a>
-  </h1>
-  <time datetime="2019-07-24T09:56:13&#43;0100" class="post-date">Wed, Jul 24, 2019</time>
-  The other day I was solving an Exercism.io exercise that involved calculating the frequency of letters in multiple texts in parallel using only a specific number of &ldquo;workers&rdquo;. This same exercise helped me stumble into Task.async_stream/3 and Task.async_stream/5.
-For those unfamiliar with the Task module here&rsquo;s the description you can find on Elixir&rsquo;s documentation:
- Conveniences for spawning and awaiting tasks. Tasks are processes meant to execute one particular action throughout their lifetime, often with little or no communication with other processes.
-  
-  <div class="read-more-link">
-    <a href="/posts/elixir-findings-asynchronous-task-streams/">Read More…</a>
-  </div>
-  
-</article>
+	<nav class="nav">
+		<ul class="flat">
+			
+			<li>
+				<a href="/">Home</a>
+			</li>
+			
+			<li>
+				<a href="/posts">Posts</a>
+			</li>
+			
+			<li>
+				<a href="/about">About</a>
+			</li>
+			
+			<li>
+				<a href="/tags">Tags</a>
+			</li>
+			
+		</ul>
+	</nav>
 </div>
-    </main>
 
-    
+
+		<div class="recent-posts section">
+			<div class="posts">
+				
+				
+				
+					<div class="post">
+						<div class="post-header">
+							<div class="meta">
+								<div class="date">
+									<span class="day">18</span>
+                  <span class="rest">Feb 2020</span>
+								</div>
+							</div>
+							<div class="matter">
+								<h4 class="title small">
+									<a href="/posts/mocking-asynchronous-functions-python/">Mocking Asynchronous Functions In Python</a>
+								</h4>
+								<span class="description">
+									
+										Post on how to mock asynchronous (asyncio) functions in Python.
+									
+								</span>
+							</div>
+						</div>
+					</div>
+				
+					<div class="post">
+						<div class="post-header">
+							<div class="meta">
+								<div class="date">
+									<span class="day">07</span>
+                  <span class="rest">Jan 2020</span>
+								</div>
+							</div>
+							<div class="matter">
+								<h4 class="title small">
+									<a href="/posts/creating-twitter-cards/">How to make Twitter preview your website links</a>
+								</h4>
+								<span class="description">
+									
+										Blogpost on how to update your website so that whenever you tweet about it Twitter displays a preview of the content.
+									
+								</span>
+							</div>
+						</div>
+					</div>
+				
+					<div class="post">
+						<div class="post-header">
+							<div class="meta">
+								<div class="date">
+									<span class="day">23</span>
+                  <span class="rest">Dec 2019</span>
+								</div>
+							</div>
+							<div class="matter">
+								<h4 class="title small">
+									<a href="/posts/python-tuple-syntax-is-confusing/">Python Tuple Syntax Is Confusing</a>
+								</h4>
+								<span class="description">
+									
+										Post about how Python&#39;s tuple syntax can make you run around trying to fix bugs that are easily avoided.
+									
+								</span>
+							</div>
+						</div>
+					</div>
+				
+					<div class="post">
+						<div class="post-header">
+							<div class="meta">
+								<div class="date">
+									<span class="day">24</span>
+                  <span class="rest">Jul 2019</span>
+								</div>
+							</div>
+							<div class="matter">
+								<h4 class="title small">
+									<a href="/posts/elixir-findings-asynchronous-task-streams/">Elixir Findings: Asynchronous Task Streams</a>
+								</h4>
+								<span class="description">
+									
+										Blogpost documenting how to use Task.async_stream/2 to run tasks in parallel using Elixir
+									
+								</span>
+							</div>
+						</div>
+					</div>
+				
+				
+
+
+			</div>
+		</div>
+	</div>
+	<div class="footer wrapper">
+	<nav class="nav">
+		<div> <a href="https://github.com/knadh/hugo-ink">Ink</a> theme on <a href="https://gohugo.io">Hugo</a></div>
+	</nav>
+</div>
+
+
 <script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
@@ -129,6 +175,6 @@ if (!doNotTrack) {
 }
 </script>
 <script async src='https://www.google-analytics.com/analytics.js'></script>
-
-  </body>
+<script>feather.replace()</script>
+</body>
 </html>
