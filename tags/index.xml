@@ -2,30 +2,30 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on dino (dot) codes</title>
-    <link>http://www.dino.codes/tags/</link>
+    <link>https://dino.codes/tags/</link>
     <description>Recent content in Tags on dino (dot) codes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 18 Feb 2020 22:12:15 +0000</lastBuildDate>
     
-	<atom:link href="http://www.dino.codes/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://dino.codes/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Python</title>
-      <link>http://www.dino.codes/tags/python/</link>
+      <link>https://dino.codes/tags/python/</link>
       <pubDate>Tue, 18 Feb 2020 22:12:15 +0000</pubDate>
       
-      <guid>http://www.dino.codes/tags/python/</guid>
+      <guid>https://dino.codes/tags/python/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Elixir</title>
-      <link>http://www.dino.codes/tags/elixir/</link>
+      <link>https://dino.codes/tags/elixir/</link>
       <pubDate>Wed, 24 Jul 2019 09:56:13 +0100</pubDate>
       
-      <guid>http://www.dino.codes/tags/elixir/</guid>
+      <guid>https://dino.codes/tags/elixir/</guid>
       <description></description>
     </item>
     

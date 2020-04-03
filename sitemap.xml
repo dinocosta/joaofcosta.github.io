@@ -3,52 +3,52 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://www.dino.codes/posts/mocking-asynchronous-functions-python/</loc>
+    <loc>https://dino.codes/posts/mocking-asynchronous-functions-python/</loc>
     <lastmod>2020-02-18T22:12:15+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://www.dino.codes/posts/</loc>
-    <lastmod>2020-02-18T22:12:15+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://www.dino.codes/tags/python/</loc>
+    <loc>https://dino.codes/posts/</loc>
     <lastmod>2020-02-18T22:12:15+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://www.dino.codes/tags/</loc>
+    <loc>https://dino.codes/tags/python/</loc>
     <lastmod>2020-02-18T22:12:15+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://www.dino.codes/</loc>
+    <loc>https://dino.codes/tags/</loc>
     <lastmod>2020-02-18T22:12:15+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://www.dino.codes/posts/creating-twitter-cards/</loc>
+    <loc>https://dino.codes/</loc>
+    <lastmod>2020-02-18T22:12:15+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://dino.codes/posts/creating-twitter-cards/</loc>
     <lastmod>2020-01-07T16:19:41+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://www.dino.codes/posts/python-tuple-syntax-is-confusing/</loc>
+    <loc>https://dino.codes/posts/python-tuple-syntax-is-confusing/</loc>
     <lastmod>2019-12-23T12:41:57+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://www.dino.codes/tags/elixir/</loc>
+    <loc>https://dino.codes/tags/elixir/</loc>
     <lastmod>2019-07-24T09:56:13+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://www.dino.codes/posts/elixir-findings-asynchronous-task-streams/</loc>
+    <loc>https://dino.codes/posts/elixir-findings-asynchronous-task-streams/</loc>
     <lastmod>2019-07-24T09:56:13+01:00</lastmod>
   </url>
   
