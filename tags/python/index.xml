@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Python on dino (dot) codes</title>
+    <link>http://www.dino.codes/tags/python/</link>
+    <description>Recent content in Python on dino (dot) codes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 18 Feb 2020 22:12:15 +0000</lastBuildDate>
+    
+	<atom:link href="http://www.dino.codes/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Mocking Asynchronous Functions In Python</title>
+      <link>http://www.dino.codes/posts/mocking-asynchronous-functions-python/</link>
+      <pubDate>Tue, 18 Feb 2020 22:12:15 +0000</pubDate>
+      
+      <guid>http://www.dino.codes/posts/mocking-asynchronous-functions-python/</guid>
+      <description>Introduction You might have already heard about Python&amp;rsquo;s asyncio module, it allows you to easily run concurrent code using Python. In the last few months I&amp;rsquo;ve worked in some codebases which take advantage of the benefits of asyncio, mainly through their use of aiohttp.
+When using asyncio you&amp;rsquo;ll use the async/await keywords to both define and call asynchronous functions. This also means changes in the way you test your code because, unlike ordinary functions, asynchronous functions always return a coroutine object, which needs to be awaited, using the await keyword in order to actually schedule it, run it and get the actual return value.</description>
+    </item>
+    
+    <item>
+      <title>Python Tuple Syntax Is Confusing</title>
+      <link>http://www.dino.codes/posts/python-tuple-syntax-is-confusing/</link>
+      <pubDate>Mon, 23 Dec 2019 12:41:57 +0000</pubDate>
+      
+      <guid>http://www.dino.codes/posts/python-tuple-syntax-is-confusing/</guid>
+      <description>Creating a list or a set with only one element, in Python, is pretty straight forward:
+# one element list. [&amp;#34;this is a list&amp;#34;] # one element set. {&amp;#34;this is a set&amp;#34;} However, that&amp;rsquo;s not the case if you want to create a tuple with only one element:
+(&amp;#34;sorry! this is not a tuple&amp;#34;) Yup, unfortunately the way you create a one element tuple does not conform with the rest of the data structures in Python which you can create using &amp;ldquo;special&amp;rdquo; characters.</description>
+    </item>
+    
+  </channel>
+</rss>
