@@ -61,6 +61,7 @@ p > a:hover {
 /* Code Blocks */
 pre {
   font-family: "IBM Plex Mono";
+  font-size: 0.85em;
 }
 
 /* Text selection background color */
