@@ -47,6 +47,17 @@ a:hover {
     border-bottom: 2px solid var(--tertiary-color);
 }
 
+/* Underline links inside paragraphs so they're visible in black and white */
+p > a {
+  color: var(--headline-color);
+  border-bottom: 2px solid var(--headline-color);
+}
+
+p > a:hover {
+  color: var(--tertiary-color);
+  border-bottom: 2px solid var(--tertiary-color);
+}
+
 /* Code Blocks */
 pre {
   font-family: "IBM Plex Mono";
