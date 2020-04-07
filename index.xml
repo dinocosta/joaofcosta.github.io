@@ -54,5 +54,17 @@ For those unfamiliar with the Task module here&amp;rsquo;s the description you c
  Conveniences for spawning and awaiting tasks. Tasks are processes meant to execute one particular action throughout their lifetime, often with little or no communication with other processes.</description>
     </item>
     
+    <item>
+      <title>Hi There!</title>
+      <link>https://dino.codes/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://dino.codes/about/</guid>
+      <description>Hi There!
+My name is Dino, I&amp;rsquo;m a Software Engineer based in Lisbon, Portugal 🇵🇹
+I&amp;rsquo;m currently working at Remote, but I&amp;rsquo;ve previously worked at Onfido and Unbabel. Although in my past experiences I&amp;rsquo;ve mainly worked with Python I&amp;rsquo;m now heavily invested in using Elixir, which I&amp;rsquo;ve been loving so far!
+In my free time I do like to mess around with synthesizers and music related stuff, I also like to read and to surf when the time allows it.</description>
+    </item>
+    
   </channel>
 </rss>
