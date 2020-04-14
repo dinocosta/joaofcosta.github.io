@@ -4,7 +4,7 @@
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Tail Call Optimization in Elixir - dino (dot) codes</title><link rel="icon" type="image/png" href=static/favicon.ico /><meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta property="og:title" content="Tail Call Optimization in Elixir" />
-<meta property="og:description" content="Blog post describing how Tail Call Optimization in Elixir can help reduce memory footprint." />
+<meta property="og:description" content="Explains what Tail Call Optimization is and shows how you can use it to reduce the memory consumption of Elixir applications." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://dino.codes/posts/tail-call-optimization-in-elixir/" />
 
@@ -15,7 +15,7 @@
 <meta name="twitter:image" content="https://dino.codes/favicon.ico"/>
 
 <meta name="twitter:title" content="Tail Call Optimization in Elixir"/>
-<meta name="twitter:description" content="Blog post describing how Tail Call Optimization in Elixir can help reduce memory footprint."/>
+<meta name="twitter:description" content="Explains what Tail Call Optimization is and shows how you can use it to reduce the memory consumption of Elixir applications."/>
 <link href='https://fonts.googleapis.com/css?family=Playfair+Display:700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" media="screen" href="https://dino.codes/css/normalize.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="https://dino.codes/css/main.css" />
@@ -79,29 +79,32 @@
 			<div class="markdown">
 				
 
-<p>Lately I&rsquo;ve been trying to look back into some Software Engineering concepts that are widely talked
-about on a day to day basis, and that I probably learned about at university, but that I ended up
+<p>Lately I&rsquo;ve been trying to think back into some Software Engineering concepts that are widely talked
+about on a day to day basis, which I probably learned about at university, but that I ended up
 forgetting about.</p>
 
-<p>One of thoses concepts is <em>Tail Call Optimization</em>. In short, Tail Call Optimization allows you to
-reduce the number stack frames stacks your program needs to maintain in the call stack for a
-tail recursive function, i.e., the recursive call is the last call of the function.</p>
+<p>One of those concepts is Tail Call Optimization. In short, Tail Call Optimization allows you to
+reduce the number of stack frames your program needs to maintain in the call stack for a
+tail recursive function, i.e., for a recursive function where the recursive call is the last call
+of the function.</p>
 
-<h2 id="example">Example</h2>
+<h2 id="a-simple-tail-recursive-function">A simple tail recursive function</h2>
 
 <p>We&rsquo;re going to use a very simple example to demanstre how this type of optimization can be achieved.
-In our example we&rsquo;re going to the factorial function since we can easily write it in a recursive
-fashion very easily:</p>
+In our example we&rsquo;re going to use the factorial function since we can easily write it in a recursive
+fashion:</p>
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">defmodule</span> <span style="color:#75af00">Factorial</span> <span style="color:#111">do</span>
   <span style="color:#111">def</span> <span style="color:#111">compute</span><span style="color:#111">(</span><span style="color:#ae81ff">0</span><span style="color:#111">),</span> <span style="color:#d88200">do</span><span style="color:#111">:</span> <span style="color:#ae81ff">1</span>
   <span style="color:#111">def</span> <span style="color:#111">compute</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">),</span> <span style="color:#d88200">do</span><span style="color:#111">:</span> <span style="color:#111">number</span> <span style="color:#f92672">*</span> <span style="color:#111">compute</span><span style="color:#111">(</span><span style="color:#111">number</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span><span style="color:#111">)</span>
 <span style="color:#111">end</span></code></pre></div>
 <p>As one can see, the above fuction (<code>Factorial.compute/1</code>) is tail recursive because the recursive
-call is the last call done by the function itself.</p>
+call is the last call done by the function itself, namely <code>compute(number - 1)</code>.</p>
 
-<p>Since this function is tail recursive that means that whenever we call this function with a value
-greater than 0 the system that&rsquo;s running it will have to keep multiple function stacks. In order to
-better understand this let&rsquo;s illustrate what happens when we call <code>Factorial.compute(5)</code>:</p>
+<p>Since this function is tail recursive, whenever we call this function with a value
+greater than 0 the system that&rsquo;s running it will have to keep multiple function stacks.</p>
+
+<p>Let&rsquo;s illustrate what happens when we call <code>Factorial.compute(5)</code> in order to better understand
+this:</p>
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4">Factorial.compute(5)
 = 5 * Factorial.compute(4)
 = 5 * (4 * Factorial.compute(3))
@@ -116,17 +119,18 @@ better understand this let&rsquo;s illustrate what happens when we call <code>Fa
 = 120</pre></div>
 <p>With the illustration above we can attest that the call to <code>Factorial.compute(5)</code> only finishes
 after all recursive calls are finished, meaning that state for the multiple function calls needs to
-be maintained and the there&rsquo;s multiple fucntion calls waiting for the result of others in order to
-finish.</p>
+be maintained and that there&rsquo;s multiple function calls waiting for the result of other functions in
+order to finish.</p>
 
-<h2 id="optimized-version">Optimized Version</h2>
+<h2 id="an-optimized-version">An optimized version</h2>
 
-<p>With the function presented above we can now start using <em>Tail Call Optimization</em> to reduce the
-number of function states that need to be kept for this factorial function.</p>
+<p>With the function presented above we can now start using Tail Call Optimization to reduce the
+number of stack frames that need to be kept for this factorial function.</p>
 
-<p>The trick here is simple, instead of doing a tall recursive call, each function does its bit of work
-and passes the result to the following call so that it doesn&rsquo;t need to wait for the recursive call
-to finish in order to return the result.</p>
+<p>The trick here is simple, instead of joining its work with the result of the recursive call, each
+function does its part of the work and passes this intermdiate result to the recursive call. This
+way there&rsquo;s no need to maintain the stack frame for this function and this memory space can be
+collected.</p>
 
 <p>Here&rsquo;s how the tail optimized version of the function looks like:</p>
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">defmodule</span> <span style="color:#75af00">Factorial</span> <span style="color:#111">do</span>
@@ -134,8 +138,11 @@ to finish in order to return the result.</p>
   <span style="color:#111">def</span> <span style="color:#111">compute</span><span style="color:#111">(</span><span style="color:#ae81ff">0</span><span style="color:#111">,</span> <span style="color:#111">accumulator</span><span style="color:#111">),</span> <span style="color:#d88200">do</span><span style="color:#111">:</span> <span style="color:#111">accumulator</span>
   <span style="color:#111">def</span> <span style="color:#111">compute</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">,</span> <span style="color:#111">accumulator</span><span style="color:#111">),</span> <span style="color:#d88200">do</span><span style="color:#111">:</span> <span style="color:#111">compute</span><span style="color:#111">(</span><span style="color:#111">number</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#111">number</span> <span style="color:#f92672">*</span> <span style="color:#111">accumulator</span><span style="color:#111">)</span>
 <span style="color:#111">end</span></code></pre></div>
+<p>Notice how we&rsquo;ve changed <code>number * compute(number - 1)</code> to
+<code>compute(number - 1, number * accumulator)</code>.</p>
+
 <p>Let&rsquo;s do the same exercise we did with the version above and let&rsquo;s illustrate, once again, what
-calling <code>Factorial.compute(5)</code> would look like:</p>
+calling <code>Factorial.compute(5)</code> would look like with this version:</p>
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4">Factorial.compute(5)
 = Factorial.compute(5, 1)
 = Factorial.compute(4, 5)
@@ -144,9 +151,18 @@ calling <code>Factorial.compute(5)</code> would look like:</p>
 = Factorial.compute(1, 120)
 = Factorial.compute(0, 120)
 = 120</pre></div>
-<p>That&rsquo;s way more simple than the call of the non-optimized version.</p>
+<p>It might be a personal opinion but I do think that it&rsquo;s way easier to reason about this version than
+the one we explored before.</p>
 
-<h2 id="measuring-performance">Measuring Performance</h2>
+<h2 id="measuring-performance">Measuring performance</h2>
+
+<p>At the beggining of this blog post I&rsquo;ve explained that this kind of optimization reduces the number
+of stack frames the applications nees to maintain. An attentive reader might have come to the
+conclusion that it should also mean that the memory footprint of the application is, then, reduced
+as a direct result of this optimization.</p>
+
+<p>To test this assumption I&rsquo;ve decided to put both versions head to head and check two metrics,
+execution time and memory usage.</p>
 
 <p>In order to measure execution time I simply used the following elixir function which will return the
 duration of the provided anonymous function call in seconds.</p>
@@ -163,14 +179,14 @@ which you can enable by running <code>:observer.start()</code> on an IEx shell.<
 
 <p>Finally, in order to test the calls I ran each one 5 times in a row, back to back, namely:</p>
 <div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#ae81ff">0</span><span style="color:#f92672">..</span><span style="color:#ae81ff">4</span> <span style="color:#f92672">|&gt;</span> <span style="color:#75af00">Enum</span><span style="color:#f92672">.</span><span style="color:#111">map</span><span style="color:#111">(</span><span style="color:#111">fn</span> <span style="color:#111">_index</span> <span style="color:#f92672">-&gt;</span> <span style="color:#75af00">Benchmark</span><span style="color:#f92672">.</span><span style="color:#111">measure</span><span style="color:#111">(</span><span style="color:#111">fn</span> <span style="color:#f92672">-&gt;</span> <span style="color:#75af00">Factorial</span><span style="color:#f92672">.</span><span style="color:#111">compute</span><span style="color:#111">(</span><span style="color:#ae81ff">100_000</span><span style="color:#111">)</span> <span style="color:#111">end</span><span style="color:#111">)</span> <span style="color:#111">end</span><span style="color:#111">)</span></code></pre></div>
-<p>Where the first this was ran was with the non-optimized version and the second time around I used
-the optimized version.</p>
+<p>In order to use the average so as toto avoid any deviations thanks to caching (which didn&rsquo;t happen,
+but better safe than sorry) and what not.</p>
 
 <h2 id="results">Results</h2>
 
 <p>Now it&rsquo;s time for the results!</p>
 
-<p>For the execution time, as expected, I had equal execution times for both versions, with the
+<p>For the execution time, as expected, both versions reported similar execution times, with the
 following times being reported on an average of 5 runs:</p>
 
 <ul>
@@ -178,22 +194,37 @@ following times being reported on an average of 5 runs:</p>
 <li>Optimized Version - 5.172864 seconds</li>
 </ul>
 
-<p>As for the memory load that&rsquo;s where we actually see the difference of the optimized version.</p>
+<p>As for the memory load, that&rsquo;s where we actually see the difference of the optimized version!</p>
 
-<p>The image below shows the 5 call to both the non-optimized and the optimized version. One can see
-the spiky pattern, memory hoarding nature, of the non-optimized version, while for the optimized
+<p>The image below shows the 5 calls to both the non-optimized (red) and the optimized (blue) version.
+One can see the spiky pattern of the non-optimized version, meaning that memory was being used by
+the multiple function calls and then released when the result was achieved, while for the optimized
 version the memory usage seems to not even grow at all!</p>
 
 <p><img src="/tail_call_optimization_results.png" alt="Memory Load Results" /></p>
-<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-elixir" data-lang="elixir"><span style="color:#111">iex</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">)</span> <span style="color:#75af00">Benchmark</span><span style="color:#f92672">.</span><span style="color:#111">measure</span><span style="color:#111">(</span><span style="color:#111">fn</span> <span style="color:#f92672">-&gt;</span> <span style="color:#75af00">Factorial</span><span style="color:#f92672">.</span><span style="color:#111">factorial</span><span style="color:#111">(</span><span style="color:#ae81ff">100_000</span><span style="color:#111">)</span> <span style="color:#111">end</span><span style="color:#111">)</span>
-<span style="color:#ae81ff">6.081734</span></code></pre></div>
+
+<p>I&rsquo;d say these are great results!</p>
+
 <h2 id="conclusion">Conclusion</h2>
 
-<p>It&rsquo;s fun to go back into these concepts and try to apply them in a pratical scenario in order to
-fully understand its impacts.</p>
+<p>It&rsquo;s fun to review these type of concepts and try to apply them in a more pratical scenario in order
+to fully understand how it works and what are its impacts.</p>
 
-<p>As for <em>Tail Call Optimization</em> it does seem like a nice, easy way to reduce memory usage in tail
-recursive functions, something that might be a very common occurrence in Elixir.</p>
+<p>As for Tail Call Optimization I&rsquo;d say it&rsquo;s a nice, easy and simple way to reduce memory usage in
+tail recursive functions, something that might be a very common occurrence in Elixir. As such, if
+you do happen to come across an Elixir application, or if you happen to work with one, try to check
+if you can apply this concept in some way.</p>
+
+<p>Lastly, I&rsquo;m planning on releasing more of these blog posts where I dive into some software
+development concept and try to explain it using Elixir so stick around and don&rsquo;t forget to keep
+checking this blog from time to time.</p>
+
+<hr />
+
+<ul>
+<li>Reddit Discussion (Will link soon)</li>
+<li>Hackernews Discussion (Will link soon)</li>
+</ul>
 
 			</div>
 
