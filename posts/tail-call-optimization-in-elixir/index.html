@@ -85,10 +85,10 @@ forgetting.</p>
 
 <p>One of those concepts is Tail Call Optimization. In short, Tail Call Optimization allows you to
 reduce the number of stack frames your program needs to maintain, in the call stack, for a
-tail recursive function, i.e., for a recursive function where the recursive call is the last call
-of the function.</p>
+recursive function by making the recursive call the last call of the function, thus transforming it
+into a tail recursive function.</p>
 
-<h2 id="a-simple-tail-recursive-function">A simple tail recursive function</h2>
+<h2 id="a-simple-recursive-function">A simple recursive function</h2>
 
 <p>I&rsquo;m going to use a very simple example to demonstrate how this type of optimization can be achieved.
 In this example I&rsquo;m going to use the factorial function since we can easily write it in a recursive
@@ -97,10 +97,11 @@ fashion:</p>
   <span style="color:#111">def</span> <span style="color:#111">compute</span><span style="color:#111">(</span><span style="color:#ae81ff">0</span><span style="color:#111">),</span> <span style="color:#d88200">do</span><span style="color:#111">:</span> <span style="color:#ae81ff">1</span>
   <span style="color:#111">def</span> <span style="color:#111">compute</span><span style="color:#111">(</span><span style="color:#111">number</span><span style="color:#111">),</span> <span style="color:#d88200">do</span><span style="color:#111">:</span> <span style="color:#111">number</span> <span style="color:#f92672">*</span> <span style="color:#111">compute</span><span style="color:#111">(</span><span style="color:#111">number</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span><span style="color:#111">)</span>
 <span style="color:#111">end</span></code></pre></div>
-<p>As one can see, the above fuction (<code>Factorial.compute/1</code>) is tail recursive because the recursive
-call is the last call done by the function itself, namely <code>compute(number - 1)</code>.</p>
+<p>As one can see, the above fuction (<code>Factorial.compute/1</code>) is recursive, one can see the call to
+<code>compute(number - 1)</code>, however the last function call is actually the multiplication (thanks
+<a href="https://twitter.com/herulume">herulume</a>).</p>
 
-<p>Since this function is tail recursive, whenever we call it with a value greater than 0 the system
+<p>Since this is a recursive function, whenever we call it with a value greater than 0 the system
 that&rsquo;s running it will have to keep multiple function stacks.</p>
 
 <p>Let&rsquo;s illustrate what happens when we call <code>Factorial.compute(5)</code> in order to better understand
@@ -141,7 +142,8 @@ collected.</p>
 <span style="color:#111">end</span></code></pre></div>
 <p>Notice how <code>number * compute(number - 1)</code> was changed to <code>compute(number - 1, number *
 accumulator)</code>. The <code>number</code> value is now multiplied with the accumulator and then passed into the
-recursive call.</p>
+recursive call and the function can now be considered a tail recursive function since the last call
+of the function is the recursive call itself.</p>
 
 <p>Let&rsquo;s do the same exercise we did with the non optimized version above and let&rsquo;s illustrate,
 once again, what calling <code>Factorial.compute(5)</code> would look like with this version:</p>
@@ -219,7 +221,8 @@ achieved, while for the optimized version the memory usage seems to not even gro
 to fully understand how they work and what are its impacts.</p>
 
 <p>As for Tail Call Optimization I&rsquo;d say it&rsquo;s a nice, easy and simple way to reduce memory usage in
-tail recursive functions, something that might be a very common occurrence in Elixir. As such, if
+recursive functions, given that you&rsquo;re able to transform them into tail recursive functions,
+something that might be a very common occurrence in Elixir. As such, if
 you do happen to come across an Elixir application, or if you happen to work with one, try to check
 if you can apply this concept in some way.</p>
 

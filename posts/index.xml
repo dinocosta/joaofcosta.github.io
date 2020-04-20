@@ -18,7 +18,7 @@
       
       <guid>https://dino.codes/posts/tail-call-optimization-in-elixir/</guid>
       <description>Lately I&amp;rsquo;ve been trying to review some Software Engineering concepts that are widely talked about on a day to day basis, that I may have learned about at university, but that I ended up forgetting.
-One of those concepts is Tail Call Optimization. In short, Tail Call Optimization allows you to reduce the number of stack frames your program needs to maintain, in the call stack, for a tail recursive function, i.</description>
+One of those concepts is Tail Call Optimization. In short, Tail Call Optimization allows you to reduce the number of stack frames your program needs to maintain, in the call stack, for a recursive function by making the recursive call the last call of the function, thus transforming it into a tail recursive function.</description>
     </item>
     
     <item>
