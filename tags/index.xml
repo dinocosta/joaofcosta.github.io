@@ -6,10 +6,19 @@
     <description>Recent content in Tags on dino (dot) codes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 18 Feb 2020 22:12:15 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 09 Mar 2020 19:14:45 +0000</lastBuildDate>
     
 	<atom:link href="https://dino.codes/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Elixir</title>
+      <link>https://dino.codes/tags/elixir/</link>
+      <pubDate>Mon, 09 Mar 2020 19:14:45 +0000</pubDate>
+      
+      <guid>https://dino.codes/tags/elixir/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Python</title>
@@ -17,15 +26,6 @@
       <pubDate>Tue, 18 Feb 2020 22:12:15 +0000</pubDate>
       
       <guid>https://dino.codes/tags/python/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Elixir</title>
-      <link>https://dino.codes/tags/elixir/</link>
-      <pubDate>Wed, 24 Jul 2019 09:56:13 +0100</pubDate>
-      
-      <guid>https://dino.codes/tags/elixir/</guid>
       <description></description>
     </item>
     
